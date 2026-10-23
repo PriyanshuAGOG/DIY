@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>try{var t=JSON.parse(sessionStorage.getItem("diy.tx")||"null");if(t&&Date.now()-t.t<15000&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.setAttribute("data-tx",t.type);setTimeout(function(){document.documentElement.removeAttribute("data-tx")},5000)}}catch(e){}</script>
+  <title>DIY · Do It Yar | Make a little chaos.</title>
+  <meta name="description" content="Remember when a cardboard box was a spaceship? Do It Yar makes papercraft kits of the cars you dreamed about as a kid. Flat paper. Your hands. Less scroll. More soul.">
+  <meta name="theme-color" content="#fbf3e4">
+  <link rel="icon" href="assets/img/logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="assets/stand/ferrari-f40.webp">
+  <link rel="stylesheet" href="assets/css/base.css?v=8">
+  <link rel="stylesheet" href="assets/css/home.css?v=8">
+</head>
+<body class="grain" data-root="" data-page="home" data-overlay>
+
+<!-- loader: a sheet of paper counts itself in -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader__in">
+    <img src="assets/img/logo.webp" alt="" width="96" height="96">
+    <b class="loader__num display" id="ldNum">00</b>
+    <span class="mono">Folding your page…</span>
+    <i class="loader__bar"><b id="ldBar"></b></i>
+  </div>
+</div>
+
+<div class="bgfx" id="bgfx" aria-hidden="true"></div>
+<div class="trail" aria-hidden="true"><i class="trail__line"></i><svg class="trail__plane" id="trailPlane" viewBox="0 0 40 40"><path d="M3 20 L37 6 L27 36 L20 24 Z" fill="#f7f5ef" stroke="#20211e" stroke-width="2" stroke-linejoin="round"/><path d="M20 24 L37 6" stroke="#20211e" stroke-width="2"/></svg></div>
+
+<main id="main">
+
+  <!-- ============ 1 · THE PAPER DREAM ============ -->
+  <section class="dream" id="top" data-bg="#fbf3e4" data-ink="dark">
+    <div class="dream__pin">
+      <div class="dream__scene" id="dreamScene">
+        <div class="dream__sun" id="sun" aria-hidden="true"><i></i></div>
+        <h1 class="dream__title" id="dreamTitle" aria-label="Less scroll. More soul.">
+          <span class="w">Less</span> <span class="w">scroll.</span><br class="br">
+          <span class="w">More</span> <span class="w o">soul.</span>
+        </h1>
+        <div class="dream__car" id="dreamCar" data-cursor="Honk" role="button" tabindex="0" aria-label="Honk the Ferrari F40"></div>
+        <svg class="dream__plane" id="planeSvg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <path id="planePath" d="M-120,300 C200,120 420,420 640,260 C820,130 980,180 1000,290 C1020,400 880,420 860,330 C840,230 1100,140 1720,210" fill="none"/>
+          <path id="planeTrail" d="M-120,300 C200,120 420,420 640,260 C820,130 980,180 1000,290 C1020,400 880,420 860,330 C840,230 1100,140 1720,210" fill="none" stroke="#20211e" stroke-width="2" stroke-dasharray="2 12" stroke-linecap="round" opacity=".35"/>
+          <g id="plane"><path d="M-26,0 L26,-12 L10,14 L2,4 Z" fill="#fffdf8" stroke="#20211e" stroke-width="2" stroke-linejoin="round"/><path d="M2,4 L26,-12" stroke="#20211e" stroke-width="2"/></g>
+        </svg>
+      </div>
+      <div class="wrap dream__ui" id="dreamUi">
+        <span class="mono">Do It Yar / an offline obsession</span>
+        <p>Flat paper. Your hands. The car you doodled in your notebook — now you build it.</p>
+        <div class="dream__cta">
+          <a class="btn btn--acid" href="cars/automobiles/index.html" data-magnetic>Enter the paper garage <span class="arr">→</span></a>
+          <a class="btn btn--ghost" href="#child">Take me back <span class="arr">↓</span></a>
+        </div>
+      </div>
+      <span class="dream__hint mono" id="dreamHint">Scroll to dive in ↓</span>
+    </div>
+  </section>
+
+  <!-- ============ 2 · REMEMBER WHEN ============ -->
+  <section class="child" id="child" data-bg="#ff641f" data-ink="dark">
+    <div class="child__pin">
+      <div class="child__sky" id="childSky" aria-hidden="true"></div>
+      <div class="wrap child__in">
+        <span class="mono">A quick question, before the cars</span>
+        <h2 class="display child__q" id="childQ">
+          <span class="ln"><span>Remember when</span></span>
+          <span class="ln"><span>a cardboard box</span></span>
+          <span class="ln"><span>was a <em>spaceship?</em></span></span>
+        </h2>
+      </div>
+      <!-- a paper bedroom pops up out of the orange; the box sits on the rug -->
+      <div class="child__room" id="childRoom" aria-hidden="true">
+      <div class="launch" aria-hidden="true">
+        <span class="launch__count display" id="lCount"><b>3</b><b>2</b><b>1</b></span>
+        <svg class="launch__smoke" viewBox="0 0 200 1000" preserveAspectRatio="none"><defs><filter id="crayon"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9"/></filter></defs><path id="lSmoke" d="M100 1000 C 76 820, 132 660, 94 500 S 112 170, 100 -20" filter="url(#crayon)"/></svg>
+        <i class="launch__shadow" id="lShadow"></i>
+        <div class="box3d" id="box3d">
+          <div class="box3d__cube" id="cube">
+            <i class="bf bf--bottom"></i><i class="bf bf--back"></i><i class="bf bf--left"></i>
+            <div class="rocket-rig"><div class="rocket" id="rocket">
+              <svg viewBox="0 0 120 260"><path d="M60 6 C86 34 94 70 94 110 V196 H26 V110 C26 70 34 34 60 6Z" fill="#d9ad74" stroke="#20211e" stroke-width="4" stroke-linejoin="round"/><path d="M60 6 C80 26 88 46 91 66 H29 C32 46 40 26 60 6Z" fill="#ff641f" stroke="#20211e" stroke-width="4" stroke-linejoin="round"/><rect x="26" y="150" width="68" height="14" fill="#efe3c4" stroke="#20211e" stroke-width="3"/><circle cx="60" cy="106" r="17" fill="#b9ecd7" stroke="#20211e" stroke-width="4"/><path d="M54 104 q6 6 12 0" stroke="#20211e" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 160 L6 214 L26 200Z M94 160 L114 214 L94 200Z" fill="#c5ef41" stroke="#20211e" stroke-width="4" stroke-linejoin="round"/><path d="M44 196 h32 l-6 16 h-20Z" fill="#20211e"/></svg>
+              <i class="rocket__flame"></i>
+            </div></div>
+            <i class="bf bf--right"><span>Fragile · dreams inside</span></i>
+            <i class="bf bf--front"><span class="stamp">↑ This side up ↑</span><span class="mark">Spaceship Nº1</span><svg class="mark__doodle" viewBox="0 0 100 60"><path d="M10 50 C30 10 60 10 90 30 M78 18 L90 30 L74 36" fill="none" stroke="#20211e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 20 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1Z" fill="#20211e"/></svg></i>
+            <i class="flap flap--l"></i><i class="flap flap--r"></i><i class="flap flap--b"></i><i class="flap flap--f"></i>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="wrap child__after" id="childA">
+        <span class="mono">Mission report · flight Nº1</span>
+        <p class="display child__big">You built whole worlds out of paper, glue and zero instructions.</p>
+        <p class="child__a">Then the screen won. <b>This is your sign to go back, one fold at a time.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 · FLAT TO FOLDED ============ -->
+  <section class="how" id="how" data-bg="#b9ecd7" data-ink="dark">
+    <div class="how__pin">
+      <div class="wrap how__grid">
+        <div class="how__left">
+          <span class="mono">How it works</span>
+          <h2 class="display">Start flat.<br>End ridiculously proud.</h2>
+          <p>Five steps from a sheet of paper to the car on your shelf.</p>
+          <ol class="how__steps" id="howSteps">
+            <li class="on"><b>01 / Get ready</b><span>Meet the pieces.</span><small>Your project starts on paper. The possibilities don’t.</small></li>
+            <li><b>02 / Cut</b><span>Free the shapes.</span><small>Follow the lines. Get into your own little zone.</small></li>
+            <li><b>03 / Fold</b><span>Give it dimension.</span><small>A few careful folds. Suddenly, it’s a whole thing.</small></li>
+            <li><b>04 / Glue</b><span>Make it stick.</span><small>Match. Join. Let it set. Commitment looks good on you.</small></li>
+            <li><b>05 / Flex</b><span>Take all the credit.</span><small>You didn’t just buy a thing. You built a legend.</small></li>
+          </ol>
+        </div>
+        <div class="how__stage" aria-hidden="true">
+          <div class="how__count display" id="howCount">01</div>
+          <div class="sheet" id="sheet">
+            <span class="sheet__a4 mono">A4 · 210 GSM</span>
+            <svg viewBox="0 0 300 400" class="sheet__svg">
+              <g class="pieces">
+                <polygon class="pc" points="40,50 140,40 160,140 60,160"/>
+                <polygon class="pc" points="170,50 260,70 240,170 160,150"/>
+                <polygon class="pc" points="50,190 150,180 140,290 40,300"/>
+                <polygon class="pc" points="170,190 260,200 250,320 160,300"/>
+                <polygon class="pc" points="80,320 220,330 200,375 90,370"/>
+              </g>
+              <g class="cutlines">
+                <polygon points="40,50 140,40 160,140 60,160"/>
+                <polygon points="170,50 260,70 240,170 160,150"/>
+                <polygon points="50,190 150,180 140,290 40,300"/>
+                <polygon points="170,190 260,200 250,320 160,300"/>
+                <polygon points="80,320 220,330 200,375 90,370"/>
+              </g>
+              <g class="glue"><circle cx="100" cy="100" r="6"/><circle cx="210" cy="110" r="6"/><circle cx="95" cy="240" r="6"/><circle cx="205" cy="255" r="6"/><circle cx="150" cy="350" r="6"/></g>
+            </svg>
+            <span class="scissors" id="scissors">✂</span>
+          </div>
+          <div class="how__final" id="howFinal"></div>
+          <div class="how__sfx" id="howSfx"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 · THE GARAGE (cinematic carousel) ============ -->
+  <section class="cf" id="garage" data-bg="#121311" data-ink="light">
+    <div class="cf__pin">
+      <div class="cf__name display" id="cfName" aria-hidden="true">Supra</div>
+      <div class="wrap cf__head">
+        <div><span class="mono">Your childhood posters grew up</span><h2 class="display">The paper garage.</h2></div>
+        <a class="btn btn--ghost" href="cars/automobiles/index.html">Walk the whole garage <span class="arr">→</span></a>
+      </div>
+      <div class="cf__stage" id="cfStage" aria-roledescription="carousel" aria-label="Fifteen paper cars">
+        <div class="cf__floor" aria-hidden="true"></div>
+        <div class="cf__ring" id="cfRing"></div>
+      </div>
+      <div class="wrap cf__info">
+        <div class="cf__meta">
+          <span class="mono" id="cfMake">Toyota / JDM sports car</span>
+          <h3 class="display" id="cfModel">Supra MK5</h3>
+          <div class="cf__sfx" id="cfSfx"></div>
+        </div>
+        <div class="cf__buy">
+          <div class="cf__price"><b id="cfPrice">₹669</b><s id="cfMrp">₹749</s></div>
+          <a class="btn btn--acid" id="cfView" href="#">View the kit <span class="arr">→</span></a>
+          <button class="btn btn--ghost" id="cfAdd">Add to bag</button>
+        </div>
+      </div>
+      <div class="wrap cf__nav">
+        <button class="rnd" id="cfPrev" aria-label="Previous car">←</button>
+        <div class="cf__track"><i id="cfBar"></i></div>
+        <span class="mono cf__now"><b id="cfNow">01</b> / 15</span>
+        <button class="rnd rnd--fill" id="cfNext" aria-label="Next car">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 · MANIFESTO ============ -->
+  <section class="manifesto" id="manifesto" data-bg="#f7f5ef" data-ink="dark">
+    <div class="wrap">
+      <span class="mono">A very serious case for play.</span>
+      <h2 class="display manifesto__big" id="manifestoBig">You don’t need to be an artist. Just a little curious.</h2>
+      <div class="manifesto__row">
+        <p>We’re building a world for the “what if I tried?” people. Paper machines today. All kinds of creative experiments tomorrow.<br><br>No perfect-person energy. Just the joy of building something that didn’t exist before you.</p>
+        <button class="chaos-btn" id="chaosBtn" data-cursor="Press"><span>✳</span><small>Certified chaos button</small></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 · PLAY ============ -->
+  <section class="arcade" id="arcade" data-bg="#20211e" data-ink="light">
+    <div class="wrap">
+      <div class="shead">
+        <div><span class="mono">The procrastination station</span><h2>Very important<br>unimportant things.</h2></div>
+        <p>No downloads. No leaderboard anxiety. Just a tiny hit of “hehe”. Win a game, unlock real money off your order.</p>
+      </div>
+      <a class="gp-banner" href="race/index.html" data-cursor="Race">
+        <div class="gp-banner__copy">
+          <span class="mono">New · multiplayer</span>
+          <b class="display">The Paper Grand Prix</b>
+          <p>Pick any of the 15 cars. Race the studio bot, a friend on the same screen, or send a link and race online.</p>
+          <span class="btn btn--acid btn--sm">Start your engines <span class="arr">→</span></span>
+        </div>
+        <div class="gp-banner__track" aria-hidden="true">
+          <img src="assets/side/toyota-supra-mk5.webp" alt="" class="gp-banner__car a" width="951" height="346" loading="lazy">
+          <img src="assets/side/bmw-m3-gtr.webp" alt="" class="gp-banner__car b" width="963" height="373" loading="lazy">
+          <span class="gp-banner__flag"></span>
+        </div>
+      </a>
+      <div class="arcade__grid" id="arcadeGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ 7 · CHAOS CLUB ============ -->
+  <section class="club" id="club" data-bg="#c6c3ff" data-ink="dark">
+    <div class="wrap club__grid">
+      <div>
+        <span class="mono">The Chaos Club / curiosity pays</span>
+        <h2 class="display">There’s more<br>than meets the eye.</h2>
+        <p class="club__lead">This site is full of secrets. Find them, win the games, fill the jar. Up to 10% off, applied automatically.</p>
+        <ul class="quests" id="quests"></ul>
+      </div>
+      <div class="jar" id="jar">
+        <img class="jar__sticker" src="assets/img/sticker.webp" alt="" width="200" height="200">
+        <div class="jar__glass"><div class="jar__fill" id="jarFill"></div><div class="jar__pct display" id="jarPct">0%</div></div>
+        <span class="mono">Your reward jar</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · FAQ ============ -->
+  <section class="sec faqsec" id="faq" data-bg="#f7f5ef" data-ink="dark">
+    <div class="wrap faq">
+      <div><span class="mono">Questions, answered</span><h2 class="display faq__h">A few things<br>before you build.</h2></div>
+      <div class="faq__list">
+        <details><summary>Do I need to be good at craft?<i>+</i></summary><p>Nope. If you could fold a paper plane, you can do this. Start with a 3–4 sheet car like the Supra or the M4 GT3, then graduate to the six-sheet monsters. You will get hooked.</p></details>
+        <details><summary>What do I need at home?<i>+</i></summary><p>A craft knife or sharp scissors, a ruler, something to score folds with (an empty ballpoint works), and a quick-grip craft glue. Patience is optional but recommended.</p></details>
+        <details><summary>How big are the finished cars?<i>+</i></summary><p>Most are 1:18 scale — around 21 to 29 cm long. The Supra MK5 and BMW M4 GT3 are 1:24. Every kit page lists the exact built size.</p></details>
+        <details><summary>How should I care for paper art?<i>+</i></summary><p>Keep it out of direct sun and humidity, and dust it with a soft brush. Treat it like a houseplant that never needs watering. <button class="hidden-star" id="hiddenStar" aria-label="A tiny star">✳</button></p></details>
+        <details><summary>How do the rewards work?<i>+</i></summary><p>Each game you win and each secret you find adds a little to your reward jar, up to 10% per order. It applies automatically in your bag. Some secrets are worth more than others…</p></details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="footer"></div>
+
+<!-- game modal -->
+<div class="gm" id="gm" role="dialog" aria-modal="true" aria-labelledby="gmTitle">
+  <div class="gm__card">
+    <div class="gm__hd"><div><span class="mono" id="gmNo"></span><h3 id="gmTitle" class="display"></h3></div><button class="x" id="gmClose" aria-label="Close game">✕</button></div>
+    <div class="gm__body" id="gmBody"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/MotionPathPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="assets/js/data.js?v=8"></script>
+<script src="assets/js/core.js?v=8"></script>
+<script src="assets/js/scenes.js?v=8"></script>
+<script src="assets/js/games.js?v=8"></script>
+<script src="assets/js/home.js?v=8"></script>
+</body>
+</html>

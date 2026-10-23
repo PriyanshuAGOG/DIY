@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>try{var t=JSON.parse(sessionStorage.getItem("diy.tx")||"null");if(t&&Date.now()-t.t<15000&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.setAttribute("data-tx",t.type);setTimeout(function(){document.documentElement.removeAttribute("data-tx")},5000)}}catch(e){}</script>
+  <title>Paper Garage · 15 Icons, Built by You | Do It Yar</title>
+  <meta name="description" content="Do It Yar Motor Club, Vol. 01: walk the paper garage. Fifteen papercraft cars — JDM legends, Le Mans heroes, hypercars — each parked in its own bay. Built by you.">
+  <meta name="theme-color" content="#121311">
+  <link rel="icon" href="../../assets/img/logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="../../assets/stand/lamborghini-aventador-lbwk.webp">
+  <link rel="stylesheet" href="../../assets/css/base.css?v=8">
+  <link rel="stylesheet" href="../../assets/css/cars.css?v=8">
+</head>
+<body class="grain gp" data-root="../../" data-page="cars" data-theme="dark" data-overlay>
+
+<main id="main">
+
+  <!-- ============ ENTRY: the garage door opens by itself ============ -->
+  <section class="entry" id="top">
+    <div class="entry__scene" id="entryScene"></div>
+    <div class="entry__car" id="entryCar" data-cursor="Rev it"></div>
+    <div class="entry__sfx" id="entrySfx"></div>
+    <div class="wrap entry__copy">
+      <span class="mono">Do It Yar Motor Club / Vol. 01</span>
+      <h1 class="display entry__title"><span>Paper</span><span class="g">Garage.</span></h1>
+      <p class="entry__kicker display">Big engine. Paper energy.</p>
+      <p class="entry__lead">15 icons. Zero parking problems. Your dream garage starts with a fold.</p>
+      <div class="entry__cta">
+        <a class="btn btn--acid" href="#halls" data-magnetic>Walk the garage <span class="arr">↓</span></a>
+        <button class="btn btn--ghost" id="entryRev">Rev it 🔊</button>
+      </div>
+      <div class="entry__sale"><span class="mono">Grand Prix week · up to 25% off · ends in</span><span class="clock" id="clock"><b data-u="d">00</b>d <b data-u="h">00</b>h <b data-u="m">00</b>m <b data-u="s">00</b>s</span></div>
+    </div>
+    <div class="entry__flash" id="flash" aria-hidden="true"></div>
+    <div class="shutter" id="shutter" aria-hidden="true"><div class="shutter__in">
+      <div class="shutter__slats"></div>
+      <span class="shutter__stencil display">Do It Yar<br>Motor Club</span>
+      <span class="shutter__no mono">Bay door 01 · authorised builders only</span>
+      <span class="shutter__handle"></span>
+    </div></div>
+  </section>
+
+  <!-- ============ THE HALLS: three chapters, walked sideways ============ -->
+  <div class="halls" id="halls">
+    <nav class="dir sticky-under" id="dir" aria-label="The lineup">
+      <span class="mono dir__lbl">The lineup / 15</span>
+      <div class="dir__links" id="dirLinks"></div>
+      <button class="dir__lights mono" id="lights" aria-pressed="true">Lights <b>on</b></button>
+    </nav>
+    <div id="hallList"></div>
+  </div>
+
+  <!-- ============ THE WHOLE LINEUP ============ -->
+  <section class="gp-sec gp-shop" id="shop">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">The showroom floor / all 15</span><h2>Shop by vibe.</h2></div>
+        <label class="gp-sort"><span class="mono">Sort</span>
+          <select class="gp-select" id="sort">
+            <option value="feat">Garage order</option>
+            <option value="deal">Biggest discount</option>
+            <option value="low">Price: low to high</option>
+            <option value="high">Price: high to low</option>
+            <option value="easy">Easiest build first</option>
+            <option value="big">Biggest model first</option>
+          </select></label>
+      </div>
+      <div class="vibes" id="vibes" role="tablist"></div>
+      <div class="pgrid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ OFFERS ============ -->
+  <section class="gp-sec gp-offers" id="offers">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">Pit stop offers / they all stack</span><h2>Offers that<br>actually stack.</h2></div><p>Everything here applies automatically in your bag. No codes to forget. No fine-print gymnastics.</p></div>
+      <div class="tickets">
+        <article class="ticket" style="--t:var(--acid)"><div class="ticket__l"><b class="display">12%</b><span class="mono">extra off</span></div><div class="ticket__r"><h3>Garage bundle</h3><p>Any 2 cars: extra 5%. Any 3 or more: extra 12% on top of this week’s prices.</p><span class="mono">Auto-applied</span></div></article>
+        <article class="ticket" style="--t:var(--purple)"><div class="ticket__l"><b class="display">10%</b><span class="mono">max</span></div><div class="ticket__r"><h3>Chaos Club</h3><p>Win races, ace the quiz, find the secrets. Up to 10% off.</p><span class="mono">Earned by playing</span></div></article>
+        <article class="ticket" style="--t:var(--mint)"><div class="ticket__l"><b class="display">₹0</b><span class="mono">shipping</span></div><div class="ticket__r"><h3>Free delivery</h3><p>On every order above ₹1,499. Which is roughly two cars. Just saying.</p><span class="mono">Auto-applied</span></div></article>
+        <article class="ticket" style="--t:var(--orange)">
+          <div class="ticket__l"><b class="display">?</b><span class="mono">mystery</span></div>
+          <div class="ticket__r scratch" id="scratch">
+            <div class="scratch__under"><h3>+2% unlocked</h3><p>Lucky fingers. Added to your reward jar.</p><span class="mono">Scratch reward</span></div>
+            <canvas id="scratchCanvas" aria-label="Scratch card: drag to reveal"></canvas>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GARAGE BUILDER ============ -->
+  <section class="gp-sec builder" id="bundle">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">Garage builder / bundle & save</span><h2>Park three.<br>Save 12%.</h2></div><p>Tap cars to park them in your garage. Your bundle price updates live — then send the whole garage to your bag.</p></div>
+      <div class="bays3" id="bays3"><div class="bay3"><span class="mono">Bay 01</span></div><div class="bay3"><span class="mono">Bay 02</span></div><div class="bay3"><span class="mono">Bay 03</span></div></div>
+      <div class="builder__sum">
+        <div><span class="mono">Garage price</span><div class="builder__price"><b class="display" id="bPrice">₹0</b><s id="bMrp"></s><span class="gp-off" id="bOff" hidden></span></div><span class="hint" id="bHint">Park 3 cars to unlock the full 12%.</span></div>
+        <div class="builder__btns"><button class="btn btn--ghost btn--sm" id="bClear">Clear garage</button><button class="btn btn--paper" id="bAdd" disabled>Add garage to bag <span class="arr">→</span></button></div>
+      </div>
+      <div class="lot" id="lot"></div>
+    </div>
+  </section>
+
+  <!-- ============ GRAND PRIX TEASER ============ -->
+  <section class="gp-sec racer" id="race">
+    <div class="wrap racer__in">
+      <div>
+        <span class="mono">Mini-game / multiplayer</span>
+        <h2 class="display">The Paper<br>Grand Prix.</h2>
+        <p>Pick any car. Race the studio bot, a friend on the same screen, or send a link and race online. Shift in the green zone. Beat the bot for 2% off.</p>
+        <div class="racer__cta"><a class="btn btn--orange" href="../../race/index.html">Start your engines <span class="arr">→</span></a><a class="btn btn--ghost" href="../../race/index.html?mode=online">Race a friend online</a></div>
+      </div>
+      <div class="racer__strip" aria-hidden="true">
+        <img src="../../assets/side/nissan-skyline-r35.webp" alt="" width="950" height="350" loading="lazy">
+        <img src="../../assets/side/mazda-787b.webp" alt="" width="977" height="305" loading="lazy">
+        <span class="racer__flag"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="gp-sec quiz" id="quiz">
+    <div class="wrap quiz__grid">
+      <div>
+        <span class="mono">Personality test / scientifically unserious</span>
+        <h2 class="display quiz__h">Which car<br>are you?</h2>
+        <p class="quiz__lead">Three questions. One soulmate on four (paper) wheels. Finish it for +1% off.</p>
+      </div>
+      <div class="quiz__card" id="quizCard"></div>
+    </div>
+  </section>
+
+  <!-- ============ SPEC LAB ============ -->
+  <section class="gp-sec lab" id="lab">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">The spec lab</span><h2>Nerd out.</h2></div>
+        <div class="lab__tabs" role="tablist"><button role="tab" data-lab="cmp" aria-selected="true">Head to head</button><button role="tab" data-lab="size" aria-selected="false">How big is 1:18?</button></div>
+      </div>
+      <div class="lab__pane" id="paneCmp">
+        <div class="cmp"><div class="cmp__side" id="cmpA"></div><div class="cmp__mid display">VS</div><div class="cmp__side" id="cmpB"></div></div>
+        <div class="cmp__bars" id="cmpBars"></div>
+      </div>
+      <div class="lab__pane" id="paneSize" hidden>
+        <p class="lab__note">Every model, drawn to scale against things you already own. Pick a car to see where it will park.</p>
+        <select class="gp-select" id="scalePick" aria-label="Choose a car to measure"></select>
+        <div class="ruler" id="ruler"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CREDIT ============ -->
+  <section class="gp-sec credit">
+    <div class="wrap credit__in">
+      <img src="../../assets/img/sticker.webp" alt="" width="140" height="140">
+      <div>
+        <h2 class="display">Designed with respect.<br>Built by you.</h2>
+        <p>Papercraft designs by Wong Hidayat (Wongday). Physical DIY kits printed on 210 GSM matte card by Do It Yar. Product images are visualisations of finished builds — your fold lines, your glue joins, your story.</p>
+        <a class="btn btn--acid" href="#top">Back to the garage door ↑</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer"></div>
+
+<div class="bagbar" id="bagbar"><div><b id="dockTotal">₹0</b><span class="mono" id="dockCount">0 items</span></div><button class="btn btn--acid btn--sm" data-open="bag">View bag →</button></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Flip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../../assets/js/data.js?v=8"></script>
+<script src="../../assets/js/core.js?v=8"></script>
+<script src="../../assets/js/scenes.js?v=8"></script>
+<script src="../../assets/js/cars.js?v=8"></script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>try{var t=JSON.parse(sessionStorage.getItem("diy.tx")||"null");if(t&&Date.now()-t.t<15000&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.setAttribute("data-tx",t.type);setTimeout(function(){document.documentElement.removeAttribute("data-tx")},5000)}}catch(e){}</script>
+  <title>Paper Grand Prix · Race your friends | Do It Yar</title>
+  <meta name="description" content="Pick any of 15 paper cars and race: against the studio bot, a friend on the same screen, or online with a link. Shift in the green, first to the flag wins.">
+  <meta name="theme-color" content="#121311">
+  <link rel="icon" href="../assets/img/logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css?v=8">
+  <link rel="stylesheet" href="../assets/css/race.css?v=8">
+</head>
+<body class="grain gp" data-root="../" data-page="race" data-theme="dark">
+<main id="main">
+
+  <section class="rx-hero">
+    <div class="wrap rx-hero__in">
+      <div class="rx-hero__copy">
+        <span class="mono">Do It Yar Motor Club / multiplayer</span>
+        <h1 class="display">Paper<br>Grand Prix.</h1>
+        <p>Pick any of the 15 cars. Launch on green, shift in the green, first to the chequered flag wins.</p>
+      </div>
+      <div class="rx-modes" role="tablist" aria-label="Race mode">
+        <button role="tab" data-mode="bot" aria-selected="true"><b>Vs studio bot</b><span>Solo · three difficulties · beat it for 2% off</span></button>
+        <button role="tab" data-mode="duel" aria-selected="false"><b>Same screen</b><span>Two players · one device · A vs L</span></button>
+        <button role="tab" data-mode="online" aria-selected="false"><b>Race a friend online</b><span>Send a link · race from anywhere</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="rx">
+    <div class="wrap">
+
+      <!-- the two garages -->
+      <div class="rx-grid">
+        <div class="slot" id="slotA">
+          <span class="mono slot__who">Player 1 · <b id="nameA">You</b></span>
+          <div class="slot__car" id="slotCarA"></div>
+          <h3 class="slot__name" id="slotNameA">—</h3>
+          <button class="btn btn--ghost btn--sm" data-pick="A">Change car</button>
+        </div>
+        <div class="rx-vs display" aria-hidden="true">VS</div>
+        <div class="slot" id="slotB">
+          <span class="mono slot__who" id="whoB">Studio bot</span>
+          <div class="slot__car" id="slotCarB"></div>
+          <h3 class="slot__name" id="slotNameB">—</h3>
+          <div class="slot__row">
+            <button class="btn btn--ghost btn--sm" data-pick="B" id="pickB">Change car</button>
+            <div class="rx-diff" id="diff" role="radiogroup" aria-label="Bot difficulty">
+              <button data-d="chill" aria-checked="false" role="radio">Chill</button>
+              <button data-d="pro" aria-checked="true" role="radio">Pro</button>
+              <button data-d="legend" aria-checked="false" role="radio">Legend</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- online lobby -->
+      <div class="lobby" id="lobby" hidden>
+        <div class="lobby__col">
+          <label class="lobby__field"><span class="mono">Your racer name</span><input id="myName" maxlength="16" autocomplete="nickname" placeholder="Racer"></label>
+          <div class="lobby__actions">
+            <button class="btn btn--acid" id="hostBtn">Create a race room</button>
+            <span class="mono lobby__or">or join one</span>
+            <div class="lobby__join"><input id="joinCode" maxlength="4" placeholder="CODE" aria-label="Room code" autocapitalize="characters" autocomplete="off"><button class="btn btn--paper" id="joinBtn">Join</button></div>
+          </div>
+        </div>
+        <div class="lobby__col">
+          <div class="lobby__share" id="share" hidden>
+            <span class="mono">Your room</span>
+            <code class="lobby__code" id="roomCode">----</code>
+            <div class="lobby__btns"><button class="btn btn--ghost btn--sm" id="copyLink">Copy invite link</button><button class="btn btn--ghost btn--sm" id="shareLink" hidden>Share…</button><a class="btn btn--ghost btn--sm" id="waLink" target="_blank" rel="noopener">WhatsApp</a></div>
+          </div>
+          <p class="lobby__state" id="lobbyState">Create a room and send the link to a friend — or type their code to join.</p>
+          <button class="btn btn--orange" id="readyBtn" hidden>I’m ready</button>
+        </div>
+      </div>
+
+      <!-- the paper track -->
+      <div class="track" id="track">
+        <div class="track__marks" aria-hidden="true"><i style="--p:.25"><span>¾</span></i><i style="--p:.5"><span>½</span></i><i style="--p:.75"><span>¼</span></i></div>
+        <div class="track__finish" aria-hidden="true"></div>
+        <div class="track__start mono" aria-hidden="true">START</div>
+        <div class="lane" id="laneA"><span class="lane__tag mono" id="tagA">P1</span><img class="lane__car" id="carA" alt=""></div>
+        <div class="lane" id="laneB"><span class="lane__tag mono" id="tagB">BOT</span><img class="lane__car" id="carB" alt=""></div>
+        <div class="lights" id="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="track__flag mono" id="trackMsg" aria-live="polite"></div>
+      </div>
+
+      <!-- controls -->
+      <div class="hud">
+        <div class="tachbox" id="hudA">
+          <svg viewBox="0 0 200 118" class="tach" aria-hidden="true"><path d="M20,108 A80,80 0 0,1 180,108" class="tach__bg"/><path d="M134,38 A80,80 0 0,1 163,70" class="tach__green"/><path d="M175,92 A80,80 0 0,1 180,108" class="tach__red"/><line class="needle" x1="100" y1="108" x2="100" y2="38"/></svg>
+          <div class="tachbox__row"><span class="mono">P1 · gear <b class="gear">–</b></span><span class="mono q"></span></div>
+          <button class="shift" data-player="A">SHIFT<small class="mono">Space / A / tap</small></button>
+        </div>
+        <div class="hud__mid">
+          <button class="btn btn--orange" id="goBtn">Start race 🏁</button>
+          <p class="hud__msg" id="raceMsg">Lights out and away we go.</p>
+          <span class="mono hud__keys" id="keysHint">Tap SHIFT (or press Space) to launch on green, then every time the needle hits the green.</span>
+        </div>
+        <div class="tachbox" id="hudB">
+          <svg viewBox="0 0 200 118" class="tach" aria-hidden="true"><path d="M20,108 A80,80 0 0,1 180,108" class="tach__bg"/><path d="M134,38 A80,80 0 0,1 163,70" class="tach__green"/><path d="M175,92 A80,80 0 0,1 180,108" class="tach__red"/><line class="needle" x1="100" y1="108" x2="100" y2="38"/></svg>
+          <div class="tachbox__row"><span class="mono"><span id="hudBName">BOT</span> · gear <b class="gear">–</b></span><span class="mono q"></span></div>
+          <button class="shift" data-player="B" hidden>SHIFT<small class="mono">L / tap</small></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rx-how">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">How to win</span><h2>Three rules.<br>Zero fuel.</h2></div><p>Every car is equally fast on paper. The race is decided by your timing, not your wallet.</p></div>
+      <div class="rx-rules">
+        <article><b class="display">01</b><h3>Launch on green</h3><p>Hit SHIFT the moment the lights go green. React in under 0.25s for a launch boost. Jump early and you’ll eat a penalty.</p></article>
+        <article><b class="display">02</b><h3>Shift in the green</h3><p>Four shifts. Each one in the green zone of the rev needle is a PERFECT shift with a tiny boost. Too early bogs you down.</p></article>
+        <article><b class="display">03</b><h3>Respect the limiter</h3><p>Leave it too long and you bounce off the red line and lose speed. Fifth gear takes you home.</p></article>
+      </div>
+      <p class="rx-note mono">Online races connect your two browsers directly (peer-to-peer). A small public matchmaking server only introduces you — nothing else is stored.</p>
+    </div>
+  </section>
+</main>
+
+<div id="footer"></div>
+
+<!-- car picker -->
+<div class="picker" id="picker" role="dialog" aria-modal="true" aria-labelledby="pickTitle">
+  <div class="picker__card">
+    <div class="picker__hd"><h3 class="display" id="pickTitle">Pick your ride</h3><button class="x" id="pickClose" aria-label="Close">✕</button></div>
+    <div class="picker__grid" id="pickGrid"></div>
+  </div>
+</div>
+
+<!-- results -->
+<div class="res" id="res" role="dialog" aria-modal="true" aria-labelledby="resTitle">
+  <div class="res__card">
+    <span class="mono" id="resKick">Results</span>
+    <h3 class="display" id="resTitle">You win!</h3>
+    <div class="res__rows" id="resRows"></div>
+    <div class="res__btns"><button class="btn btn--orange" id="rematch">Rematch</button><button class="btn btn--ghost" id="resClose">Change cars</button><button class="btn btn--ghost" id="resShare">Share result</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../assets/js/data.js?v=8"></script>
+<script src="../assets/js/core.js?v=8"></script>
+<script src="../assets/js/race.js?v=8"></script>
+</body>
+</html>

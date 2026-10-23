@@ -1,0 +1,15 @@
+# personal files that live in this folder but are not part of the website
+ChatGPT Image*
+*.docx
+*.pdf
+
+# local-only tooling
+_qa/
+.claude/
+.vercel/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
