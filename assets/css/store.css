@@ -45,7 +45,7 @@
 .rnd { width: clamp(42px, calc(var(--u) * 4.2), 58px); aspect-ratio: 1; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; font-size: 18px; transition: transform .3s var(--ease), background .3s, color .3s; }
 .rnd:hover { transform: scale(1.08); }
 .rnd--fill { background: var(--paper); color: var(--ink); border-color: var(--paper); }
-@media (max-width: 900px), (max-aspect-ratio: 4/5) {
+@media (max-width: 600px), (max-aspect-ratio: 4/5) {
   .show::after { background: linear-gradient(0deg, rgba(18,19,17,.95) 0%, rgba(18,19,17,.75) 44%, rgba(18,19,17,0) 70%); }
   .show__car, .show__plat { right: 50%; translate: 50% 0; width: 84vw; bottom: auto; top: calc(var(--bar-h) + var(--header-h) + 6vh); }
   .show__name { top: calc(var(--bar-h) + var(--header-h) + 1vh); font-size: 24vw; }

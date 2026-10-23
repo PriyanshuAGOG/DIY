@@ -42,7 +42,7 @@
 .shutter__no { position: absolute; left: 50%; top: 72%; transform: translateX(-50%); color: #c9c8c0; z-index: 1; white-space: nowrap; }
 .shutter__handle { position: absolute; left: 50%; bottom: 7%; width: clamp(120px, 16vw, 260px); height: 18px; transform: translateX(-50%); border-radius: 6px; background: linear-gradient(#9a9c95, #5c5e58); box-shadow: 0 4px 0 #1a1b18; z-index: 1; }
 
-@media (max-width: 900px), (max-aspect-ratio: 4/5) {
+@media (max-width: 600px), (max-aspect-ratio: 4/5) {
   .entry::after { background: linear-gradient(0deg, rgba(18,19,17,.95) 0%, rgba(18,19,17,.8) 44%, rgba(18,19,17,0) 70%); }
   .entry__car { right: 50%; translate: 50% 0; width: 92vw; bottom: auto; top: calc(var(--bar-h) + var(--header-h) + 3vh); }
   .entry__sfx { right: 50%; translate: 50% 0; bottom: auto; top: calc(var(--bar-h) + var(--header-h) + 3vh + 46vw + 1vh); font-size: 11vw; }
