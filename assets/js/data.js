@@ -53,17 +53,21 @@
     { rec: 'ZIPPER', by: 'AndreaM84', lic: 'CC0', url: FS + '250586/' },
     { rec: 'RollerShutter_IT', by: 'uniuniversal', lic: 'CC0', url: FS + '617980/' },
     { rec: 'Garage Door Closes', by: 'dannydandanshababaloo', lic: 'CC0', url: FS + '593200/' },
-    { rec: 'partypopper', by: 'Streety', lic: 'CC0', url: FS + '26349/' },
-    { rec: 'Firecracker', by: 'SamsterBirdies', lic: 'CC0', url: FS + '506982/' },
-    { rec: 'Firework Crackle', by: 'LukaCafuka', lic: 'CC0', url: FS + '750682/' }
+    { rec: 'S026_Airhorn_Bright_Sound_Mono', by: 'Pól', lic: 'CC0', url: FS + '385922/' },
+    { rec: 'kids_WOAH', by: 'DesignDean', lic: 'CC0', url: FS + '397317/' },
+    { rec: 'Horn 1 (Too-doo Clown)', by: 'FunWithSound', lic: 'CC0', url: FS + '608085/' },
+    { rec: 'Honky!', by: 'clubpegiunbint', lic: 'CC0', url: FS + '662393/' },
+    { rec: 'Bicycle / Bike Horn - Triple Honk 3', by: 'manofham', lic: 'CC0', url: FS + '700138/' },
+    { rec: 'Squeaky Toy #1', by: 'Breviceps', lic: 'CC0', url: FS + '468443/' }
   ];
 
   const views = ['front-three-quarter', 'side-profile', 'rear-three-quarter', 'overhead', 'paper-detail'];
   const labels = ['Front three-quarter', 'Side profile', 'Rear three-quarter', 'Overhead', 'Paper detail'];
 
-  // every car stands as in its front-three-quarter studio photo: all four wheels down, its own floor shadow kept.
+  // every car stands as in its front-three-quarter studio photo (an AI matte for the car, the photo's own floor shadow kept):
+  // all four wheels down.
   // those photos all look left, so every car faces left; ar is each cutout's trimmed aspect.
-  const AR = { 'bmw-m3-gtr': 1.801, 'mitsubishi-evo-8-nfs-most-wanted': 1.703, 'mazda-rx-7-abflug-anubis': 1.775, 'nissan-skyline-r35': 1.915, 'toyota-supra-mk5': 1.959, 'mazda-787b': 1.77, 'bmw-m4-gt3': 1.632, 'audi-quattro-s1': 1.734, 'ferrari-f40': 1.781, 'lamborghini-huracan-sto': 1.557, 'lamborghini-aventador-lbwk': 1.797, 'bugatti-centodieci': 1.992, 'rolls-royce-phantom': 1.9, 'hennessey-venom-f5': 2.145, 'devel-sixteen': 1.733 };
+  const AR = { 'bmw-m3-gtr': 1.805, 'mitsubishi-evo-8-nfs-most-wanted': 1.699, 'mazda-rx-7-abflug-anubis': 1.774, 'nissan-skyline-r35': 1.909, 'toyota-supra-mk5': 1.956, 'mazda-787b': 1.769, 'bmw-m4-gt3': 1.63, 'audi-quattro-s1': 1.727, 'ferrari-f40': 1.775, 'lamborghini-huracan-sto': 1.557, 'lamborghini-aventador-lbwk': 1.788, 'bugatti-centodieci': 1.984, 'rolls-royce-phantom': 1.919, 'hennessey-venom-f5': 2.127, 'devel-sixteen': 1.743 };
   const cars = raw.map((c, i) => {
     const slug = c.sku.toLowerCase();
     return Object.assign(c, {
@@ -81,10 +85,10 @@
         src: `assets/cars/${c.id}/${slug}-0${n + 1}-${v}.${c.id === 'lamborghini-aventador-lbwk' && n === 4 ? 'png' : 'webp'}`,
         label: labels[n]
       })),
-      cut: `assets/stand/${c.id}.webp`,      // lifted off the studio paper, floor shadow kept
-      thumb: `assets/stand/sm/${c.id}.webp`,  // 800px version for cards and pickers
+      cut: `assets/stand/${c.id}.webp?v=2`,      // lifted off the studio paper, floor shadow kept
+      thumb: `assets/stand/sm/${c.id}.webp?v=2`,  // 800px version for cards and pickers
       side: `assets/side/${c.id}.webp`,    // side profile sprite, always nose-left
-      cutout: `assets/stand/${c.id}.webp`,
+      cutout: `assets/stand/${c.id}.webp?v=2`,
       href: `products/${c.id}/index.html`,
       credit: 'Papercraft design by Wong Hidayat (Wongday). Physical DIY kit by Do It Yar.',
       snd: sounds[c.id], vol: c.id === 'rolls-royce-phantom' ? .7 : 1
@@ -118,5 +122,21 @@
     return Object.assign(k, { list, mrp, price: Math.round(sale * .88) });
   });
 
-  window.DIY = { cars, all: cars, chapters, groups, vibes, combos, fxCredits };
+  // the catalogue, curated: five shelves of three or four instead of fifteen kits thrown on a table.
+  // the first four split the lineup; "first builds" is picked from the data (fewest sheets, friendliest level)
+  const lvlRank = { 'Intermediate': 1, 'Intermediate–Advanced': 2, 'Advanced': 3 };
+  const easiest = [...cars].sort((a, b) => lvlRank[a.level] - lvlRank[b.level] || a.pages - b.pages || a.salePrice - b.salePrice).slice(0, 4).map(c => c.id);
+  const collections = [
+    { id: 'jdm', name: 'JDM legends', line: 'Turbos, rotaries and the posters from your school bag.', color: '#ff641f', cars: ['toyota-supra-mk5', 'nissan-skyline-r35', 'mazda-rx-7-abflug-anubis', 'mitsubishi-evo-8-nfs-most-wanted'] },
+    { id: 'track', name: 'Born on the track', line: 'Le Mans, Group B and GT3. Race numbers included.', color: '#c5ef41', cars: ['mazda-787b', 'audi-quattro-s1', 'bmw-m4-gt3', 'bmw-m3-gtr'] },
+    { id: 'poster', name: 'The poster wall', line: 'Every bedroom wall had one of these. Now it can stand on your shelf.', color: '#f6c3d4', cars: ['ferrari-f40', 'lamborghini-aventador-lbwk', 'lamborghini-huracan-sto', 'hennessey-venom-f5'] },
+    { id: 'flex', name: 'Big money energy', line: 'Sixteen cylinders, a Bugatti birthday present and one very quiet Rolls.', color: '#c6c3ff', cars: ['devel-sixteen', 'bugatti-centodieci', 'rolls-royce-phantom'] },
+    { id: 'first', name: 'Perfect first builds', line: 'Fewest sheets, friendliest folds. Start your garage here.', color: '#b9ecd7', cars: easiest }
+  ].map((k, i) => {
+    const list = k.cars.map(id => cars.find(c => c.id === id)), sale = list.reduce((s, c) => s + c.salePrice, 0);
+    const pct = list.length >= 3 ? 12 : list.length === 2 ? 5 : 0;
+    return Object.assign(k, { no: String(i + 1).padStart(2, '0'), list, mrp: list.reduce((s, c) => s + c.price, 0), sale, pct, price: Math.round(sale * (1 - pct / 100)) });
+  });
+
+  window.DIY = { cars, all: cars, chapters, groups, vibes, combos, collections, fxCredits };
 })();

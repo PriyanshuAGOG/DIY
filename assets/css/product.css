@@ -96,7 +96,13 @@
 .tg .stg { height: clamp(80px, 12vh, 130px); }
 .tg b { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 15px; line-height: 1; }
 .tg small { font-family: var(--mono); font-size: 11px; color: #77786f; }
-.tg label { position: absolute; right: 10px; top: 10px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.tg { cursor: pointer; }
+.tg[aria-disabled] { cursor: default; }
+.tg { padding-top: 40px; }
+.tg__tick { position: absolute; z-index: 2; right: 10px; top: 12px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; }
+.tg:not(.off):not([aria-disabled]) { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,100,31,.14); }
+.tg__list { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; }
+.tg__list li::before { content: "✓ "; color: var(--acid); font-weight: 700; }
 .tg input { width: 18px; height: 18px; accent-color: var(--orange); }
 .tg__plus { font-family: var(--display); font-size: 26px; color: #8a8a83; }
 .tg__sum { display: grid; gap: 8px; padding: 16px; border-radius: 18px; background: var(--ink); color: var(--paper); }

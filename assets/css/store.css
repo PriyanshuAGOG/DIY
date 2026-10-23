@@ -10,10 +10,10 @@
 .show::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(18,19,17,.9) 0%, rgba(18,19,17,.6) 32%, rgba(18,19,17,0) 56%), linear-gradient(0deg, rgba(18,19,17,.97) 0%, rgba(18,19,17,.88) 12%, rgba(18,19,17,0) 30%); }
 .show__ctrl { padding-top: 14px; border-top: 1px solid rgba(247,245,239,.12); }
 .show__name { position: absolute; z-index: 1; right: -1vw; top: calc(var(--bar-h) + var(--header-h) + 2vh); font-size: clamp(90px, min(19vw, 32vh), 420px); line-height: .8; color: transparent; -webkit-text-stroke: 1.5px rgba(247,245,239,.2); white-space: nowrap; pointer-events: none; }
-.show__car, .show__plat { position: absolute; z-index: 2; right: 3vw; bottom: 18vh; width: min(48vw, calc(42vh * 2.2), 1100px); aspect-ratio: 2.2; touch-action: pan-y; }
+.show__car, .show__plat { position: absolute; z-index: 2; right: 3vw; bottom: 22vh; width: min(48vw, calc(42vh * 2.2), 1100px); aspect-ratio: 2.2; touch-action: pan-y; }
 .show__car .stg { position: absolute; inset: 0; z-index: 1; }
 /* the turntable: every featured car stands on a lit plinth, so nothing hovers over the scenery */
-.show__deck { position: absolute; z-index: 0; left: -7%; right: -7%; bottom: 0; aspect-ratio: 6.2; translate: 0 46%; border-radius: 50%;
+.show__deck { position: absolute; z-index: 0; left: -7%; right: -7%; bottom: 0; aspect-ratio: 4.4; translate: 0 40%; border-radius: 50%;
   background: radial-gradient(50% 50% at 50% 46%, #4a4b44 0%, #34352f 55%, #272823 78%, #1d1e1a 100%);
   box-shadow: 0 clamp(8px, 1.1vw, 16px) 0 #121311, 0 clamp(8px, 1.1vw, 16px) 0 1px rgba(247,245,239,.12), inset 0 2px 0 rgba(247,245,239,.18), 0 30px 50px rgba(0,0,0,.55); overflow: hidden; }
 .show__deck::before { content: ""; position: absolute; inset: 9% 6%; border-radius: 50%; border: 1px dashed rgba(247,245,239,.18); animation: spinDeck 14s linear infinite; }

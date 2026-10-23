@@ -122,7 +122,7 @@
   }
   function sizeItems() {
     const st = $('#cfStage').getBoundingClientRect(), narrow = innerWidth < 760;
-    const iw = Math.max(240, Math.min(st.width * (narrow ? .8 : .44), st.height * .86 * 2.2, 980));
+    const iw = Math.max(240, Math.min(st.width * (narrow ? .8 : .44), st.height * 1.7, 980)); // car + plinth always fit the stage height
     $('.cf').style.setProperty('--iw', iw + 'px');
     spacing = narrow ? innerWidth * .74 : Math.max(iw * .82, Math.min(innerWidth * .38, iw * .95)); // neighbours never touch the hero car
     layout(f);
@@ -205,7 +205,7 @@
   $('#chaosBtn').addEventListener('click', e => {
     presses++;
     document.body.classList.remove('shake'); void document.body.offsetWidth; document.body.classList.add('shake');
-    confetti(e.clientX, e.clientY, 24);
+    snd.horn(); confetti(e.clientX, e.clientY, 24, { quiet: 1 });
     const lines = ['Chaos certified.', 'Again? Bold.', 'The paper is vibrating.', 'Somewhere, a glue stick sighed.', 'You absolute menace.', 'Okay this is fun.', 'The studio bot is concerned.', 'Two more…', 'One more…'];
     if (presses < 10) toast(lines[presses - 1] || 'Chaos.', '✳');
     if (presses === 10) { pop('MAXIMUM CHAOS!', e.clientX, e.clientY - 80); reward('pop', 1, 'Chaos button'); }
@@ -258,6 +258,8 @@
     gsap.set('#cube', { rotationX: -24, rotationY: -36 });
     gsap.set('#rocket', { xPercent: -50, y: () => S() * .2 }); // tucked inside the box (nothing pokes out below it)
     names.forEach(n => gsap.set(L2(n), { transformOrigin: '50% 100%', transformPerspective: 1400 }));
+    // the night only exists once the rocket leaves; the box only once it falls in. Until then it's all the sun's orange
+    gsap.set(['#childSky', '.launch'], { autoAlpha: 0 });
     let launched = false, tIgn = .6, tLift = .65, tNight = .8;
     const tl = gsap.timeline({ scrollTrigger: { trigger: '.child__pin', start: 'top top', end: '+=340%', pin: true, scrub: .8, invalidateOnRefresh: true,
       onUpdate: s => {
@@ -275,6 +277,7 @@
       .from('.child__in .mono', { y: 20, opacity: 0, duration: .3 }, .1)
       .from('#childQ .ln > span', { yPercent: 115, stagger: .12, duration: .4, ease: 'power3.out' }, .14)
       // the box drops onto the rug, squashes, wiggles, pops its flaps
+      .set('.launch', { autoAlpha: 1 }, .62)
       .from('#box3d', { y: () => -innerHeight * .9, rotation: -14, duration: .45, ease: 'power2.in' }, .62)
       .from('#lShadow', { scale: .2, opacity: 0, duration: .45, ease: 'power2.in' }, '<')
       .to('#box3d', { keyframes: [{ scaleY: .86, scaleX: 1.08, duration: .08 }, { scaleY: 1, scaleX: 1, duration: .2, ease: 'back.out(3)' }] }, '>')
@@ -302,6 +305,7 @@
       .to('.launch', { y: () => CH() * 1.32, duration: 1.2, ease: 'power2.inOut' }, '<')
       .to(L2('front'), { yPercent: 165, duration: 1.2, ease: 'power2.inOut' }, '<')
       .to('.child__in', { y: () => CH() * .8, opacity: 0, duration: .9, ease: 'power2.in' }, '<')
+      .set('#childSky', { autoAlpha: 1 }, '<')
       .fromTo('#childSky', { yPercent: -18 }, { yPercent: 0, duration: 1.2, ease: 'power2.out' }, '<')
       .addLabel('night', '>-.35')
       .to('#rocket', { y: () => -CH() * 3.4, duration: .55, ease: 'power3.in' }, 'night')
@@ -332,12 +336,24 @@
       .fromTo('#howSfx .sfx__e .c', { xPercent: -220, opacity: 0 }, { xPercent: 0, opacity: 1, stagger: .03, duration: .5 }, '<.1');
   }
 
-  // 4 · the garage carousel is driven by scroll
+  // 4 · the garage carousel is driven by scroll. Each car holds the plinth for most of its stretch and the
+  //     hand-over is quick (no empty stage between two cars); when you stop scrolling it settles on the nearest car
+  const hold = v => { const i = Math.floor(v), t = v - i, e = t < .3 ? 0 : t > .7 ? 1 : (t - .3) / .4; return i + e * e * (3 - 2 * e); };
   cfST = ScrollTrigger.create({
-    trigger: '.cf__pin', start: 'top top', end: () => '+=' + Math.round((cars.length - 1) * innerHeight * .3), pin: true, scrub: true, invalidateOnRefresh: true,
-    onUpdate: s => { f = s.progress * (cars.length - 1); layout(f); setInfo(Math.round(f)); $('#cfBar').style.width = s.progress * 100 + '%'; gsap.set('#cfName', { xPercent: -50 - (f - Math.round(f)) * 18 }); },
+    trigger: '.cf__pin', start: 'top top', end: () => '+=' + Math.round((cars.length - 1) * innerHeight * .34), pin: true, scrub: true, invalidateOnRefresh: true,
+    onUpdate: s => { const raw = s.progress * (cars.length - 1); f = hold(raw); layout(f); setInfo(Math.round(f)); $('#cfBar').style.width = s.progress * 100 + '%'; gsap.set('#cfName', { xPercent: -50 - (f - Math.round(f)) * 18 }); },
     onRefresh: () => sizeItems()
   });
+  {
+    let snapT = 0;
+    const settle = () => {
+      if (!cfST.isActive) return;
+      const n = cars.length - 1, i = Math.round(cfST.progress * n), y = cfST.start + (cfST.end - cfST.start) * i / n;
+      if (Math.abs(scrollY - y) > 2) window.lenis ? lenis.scrollTo(y, { duration: .6 }) : window.scrollTo({ top: y, behavior: 'smooth' });
+    };
+    const idle = () => { clearTimeout(snapT); snapT = setTimeout(settle, 180); };
+    window.lenis ? lenis.on('scroll', idle) : addEventListener('scroll', idle, { passive: true });
+  }
   gsap.from('#cfRing', { y: 120, opacity: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: '.cf', start: 'top 70%' } });
 
   // 5 · manifesto words fill in

@@ -61,6 +61,19 @@
     </article>`;
   }
 
+  // the catalogue as curated shelves: a numbered header, the set deal, then its cards with room to breathe
+  function shelves(o = {}) {
+    return DIY.collections.map(k => `
+    <section class="shelf ${o.dark ? 'shelf--dark' : ''}" id="col-${k.id}" style="--c:${k.color}" aria-labelledby="colh-${k.id}">
+      <header class="shelf__hd">
+        <span class="shelf__no display" aria-hidden="true">${k.no}</span>
+        <div class="shelf__txt"><span class="mono">Collection ${k.no} · ${k.list.length} kits</span><h3 class="display" id="colh-${k.id}">${k.name}</h3><p>${k.line}</p></div>
+        <div class="shelf__deal"><span class="mono">The whole set · ${k.pct}% off</span><div><b>${inr(k.price)}</b><s>${inr(k.mrp)}</s></div><button class="btn btn--sm" data-set="${k.id}">Add all ${k.list.length} <span class="arr">→</span></button></div>
+      </header>
+      <div class="shelf__row" style="--n:${k.list.length}">${k.list.map(p => card(p, { dark: o.dark })).join('')}</div>
+    </section>`).join('');
+  }
+
   // kinetic sound word: echoes trail behind the car (opposite to the way it faces)
   const chars = t => [...t].map(ch => `<span class="c">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
   function sfx(text, o = {}) {
@@ -188,8 +201,8 @@
             <div><h4>THE GARAGE</h4><ul>
               <li><a href="${url('cars/automobiles/')}index.html">Paper garage</a></li>
               <li><a href="${url('store/')}index.html">All 15 kits</a></li>
-              <li><a href="${url('store/')}index.html?v=jdm">JDM legends</a></li>
-              <li><a href="${url('store/')}index.html?v=hyper">Hypercars</a></li></ul></div>
+              <li><a href="${url("store/")}index.html#col-jdm">JDM legends</a></li>
+              <li><a href="${url("store/")}index.html#col-flex">Hypercars</a></li></ul></div>
             <div><h4>PLAY</h4><ul>
               <li><a href="${url('race/')}index.html">Paper Grand Prix</a></li>
               <li><a href="${url('race/')}index.html?mode=online">Race a friend online</a></li>
@@ -347,7 +360,7 @@
   /* ---------- confetti + party poppers ---------- */
   const COLORS = ['#ff641f', '#c5ef41', '#b9ecd7', '#c6c3ff', '#f7f5ef', '#f6c3d4', '#20211e'];
   function confetti(x = innerWidth / 2, y = innerHeight / 2, n = 36, o = {}) {
-    if (!o.quiet) snd.fx('popper', { vol: .45, rate: .9 + Math.random() * .25 }); // every burst of confetti goes pop
+    if (!o.quiet) snd.fx('squeak', { vol: .7, rate: .9 + Math.random() * .4 }); // every little burst of confetti squeaks
     if (reduce || !window.gsap) return;
     const ang = o.angle ?? null, spread = o.spread ?? 360, power = o.power ?? 1;
     for (let i = 0; i < n; i++) {
@@ -365,11 +378,10 @@
   }
   function poppers() {
     const h = innerHeight, w = innerWidth;
-    // a real party: two poppers per volley, then the firecrackers, then the crackle as the paper rains down
+    // the "what just happened" moment: an air horn, three volleys of paper, and a whole classroom going WOAH
     [0, 350, 700].forEach((d, k) => setTimeout(() => {
-      snd.fx('popper', { vol: .95, rate: .92 + k * .06 }); setTimeout(() => snd.fx('popper', { vol: .8, rate: 1.05 + k * .05 }), 90);
-      if (k === 1) snd.fx('crackers', { vol: .7, dur: 3, fout: .7 });
-      if (k === 2) snd.fx('crackle', { vol: .65 });
+      if (k === 0) snd.fx('airhorn', { at: .15, dur: 1.5, vol: .55, fout: .3 }); // BWAAAAP
+      if (k === 2) snd.fx('woah', { at: .45, dur: 3.7, vol: 1.1, fout: .5 }); // a whole classroom going WOAH
       confetti(0, h, 70, { angle: -58, spread: 34, power: 2.3, quiet: 1 });
       confetti(w, h, 70, { angle: -122, spread: 34, power: 2.3, quiet: 1 });
       if (k === 1) confetti(w / 2, h * .55, 90, { quiet: 1 });
@@ -448,6 +460,8 @@
     }
     function fx(name, o = {}) { if (!allowed()) return; play('ui-' + name, { bus: fxBus, ...o }); }
     // a paper swish, synthesised (cheap, and it plays on the click that starts a transition)
+    // the chaos button: a different silly horn every press
+    function horn() { const [n, v] = [['horn-toodoo', .45], ['horn-honky', 2.2], ['horn-triple', .85]][Math.random() * 3 | 0]; fx(n, { vol: v, rate: .92 + Math.random() * .2 }); }
     function swish(len = .4, vol = .5, f0 = 500, f1 = 3200) {
       if (!allowed()) return;
       const t = ac.currentTime + .01, n = Math.round(ac.sampleRate * len), b = ac.createBuffer(1, n, ac.sampleRate), d = b.getChannelData(0);
@@ -476,7 +490,7 @@
       document.body.classList.toggle('snd-off', !v);
     }
     ['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, () => { const c = ctx(); if (c && on && c.state !== 'running') c.resume().then(flush, () => {}); else if (queued) flush(); }, { capture: true, passive: true }));
-    return { car, fx, swish, beep, engine, load, stopCar, set, allowed, ctx, get on() { return on; }, get bus() { return carBus; } };
+    return { car, fx, horn, swish, beep, engine, load, stopCar, set, allowed, ctx, get on() { return on; }, get bus() { return carBus; } };
   })();
 
   /* ---------- engine synth: only a fallback now, for a clip that cannot load ---------- */
@@ -684,7 +698,7 @@
       if (u.pathname === location.pathname && u.hash) {
         const t = document.querySelector(u.hash); if (!t) return;
         e.preventDefault(); closeAll();
-        window.lenis ? lenis.scrollTo(t, { offset: 0 }) : t.scrollIntoView({ behavior: 'smooth' });
+        window.lenis ? lenis.scrollTo(t, { offset: -($('#hdr').offsetHeight + 24) }) : t.scrollIntoView({ behavior: 'smooth' }); // land below the fixed header
         return;
       }
       if (u.pathname === location.pathname && u.search === location.search) return;
@@ -839,8 +853,10 @@
      (formsubmit.co), which emails each lead to the inbox below: no server, no account. The very first
      submission makes FormSubmit send that inbox a one-time "activate this form" email; click it once and leads flow.
      ========================================================= */
-  const LEADS_TO = 'gotu65@gmail.com'; // after activating, swap in the private alias FormSubmit emails you, to keep the address off the page
-  function lead() {
+  const LEADS_TO = 'chat.priyanshuag@gmail.com'; // after activating, swap in the private alias FormSubmit emails you, to keep the address off the page
+  let leadCtx = {};
+  function lead(o = {}) {
+    leadCtx = o; // where the wish came from (which button, which car) travels with the lead
     closeAll();
     const t = totals(), picks = t.lines.length ? t.lines : state.wish.map(id => ({ p: byId(id), qty: 1 })).filter(l => l.p);
     $('#leadCars').innerHTML = picks.slice(0, 3).map(l => `<i>${stage(l.p, { alt: '' })}</i>`).join('');
@@ -867,8 +883,21 @@
       if (bad) { err.textContent = bad[1]; f.elements[bad[0]].focus(); return; }
       if (v._honey) return; // only a bot fills the invisible field
       err.textContent = ''; go.disabled = true; go.firstChild.textContent = 'Sending… ';
-      const t = totals(), cars = t.lines.map(l => `${l.p.name} × ${l.qty}`).join(', ') || (state.wish.length ? state.wish.map(id => byId(id).name).join(', ') + ' (wishlist)' : 'Just curious');
-      const body = { name, phone, email, cars, 'bag total': t.lines.length ? inr(t.total) : '—', page: location.href, _subject: `New Do It Yar lead: ${name}`, _template: 'table', _captcha: 'false' };
+      // everything about the wish is read from the bag and wishlist: the visitor only types name, phone and email.
+      // one row per car keeps the inbox easy to tally (which kits are most wanted)
+      const t = totals(), wl = state.wish.map(byId).filter(Boolean), trig = leadCtx.car && byId(leadCtx.car);
+      const shelfOf = p => (DIY.collections.find(k => k.id !== 'first' && k.cars.includes(p.id)) || {}).name || '';
+      const body = { name, phone, email };
+      t.lines.forEach((l, i) => { body[`car ${i + 1}`] = `${l.p.name} × ${l.qty}  (${inr(priceOf(l.p) * l.qty)} · ${shelfOf(l.p)} · ${l.p.sku})`; });
+      Object.assign(body, {
+        'kits in bag': t.lines.length ? `${t.count} kit${t.count > 1 ? 's' : ''}: ${t.lines.map(l => l.p.model).join(', ')}` : 'none',
+        'bag total': t.lines.length ? `${inr(t.total)} (bundle −${t.bundlePct}%, rewards −${t.rewardPct}%)` : '—',
+        'wishlist': wl.length ? wl.map(p => p.name).join(', ') : 'none',
+        'clicked': leadCtx.via ? `${leadCtx.via}${trig ? ': ' + trig.name : ''}` : 'Checkout',
+        'page': location.pathname,
+        _subject: `New lead: ${name} · ${t.lines.length ? t.lines.map(l => l.p.model).join(', ') : wl.length ? 'wishlist ' + wl.map(p => p.model).join(', ') : 'just curious'}`,
+        _template: 'table', _captcha: 'false'
+      });
       let ok = false;
       try {
         const r = await fetch('https://formsubmit.co/ajax/' + LEADS_TO, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
@@ -898,18 +927,24 @@
   /* ---------- events ---------- */
   function events() {
     document.addEventListener('click', e => {
-      const t = e.target.closest('[data-add],[data-buy],[data-wish],[data-open],[data-close],[data-tab],[data-qty],[data-checkout],[data-confetti],[data-rev],[data-sound],#burger,#scrim');
+      const t = e.target.closest('[data-add],[data-buy],[data-set],[data-wish],[data-open],[data-close],[data-tab],[data-qty],[data-checkout],[data-confetti],[data-rev],[data-sound],#burger,#scrim');
       if (!t) return;
       if (t.dataset.add) { e.preventDefault(); add(t.dataset.add, 1, t); if ($('#drawer').classList.contains('on')) renderDrawer(); added(t); }
-      else if (t.dataset.buy) { e.preventDefault(); add(t.dataset.buy, 1, t, true); added(t); setTimeout(() => lead(), 450); }
+      else if (t.dataset.buy) { e.preventDefault(); add(t.dataset.buy, 1, t, true); added(t); setTimeout(() => lead({ via: 'Buy now', car: t.dataset.buy }), 450); }
+      else if (t.dataset.set) {
+        e.preventDefault(); const k = DIY.collections.find(x => x.id === t.dataset.set); if (!k) return;
+        k.list.forEach((p, i) => add(p.id, 1, i ? null : t, true));
+        toast(`Parked ${k.list.map(p => p.model).join(', ')}. ${k.pct}% set bundle applied.`, '🏁', 'View bag', () => open('bag'));
+        const r = t.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 30);
+      }
       else if (t.dataset.wish) { e.preventDefault(); wish(t.dataset.wish); }
       else if (t.dataset.rev) { e.preventDefault(); const r = t.getBoundingClientRect(); honk(byId(t.dataset.rev), r.left + r.width / 2, r.top - 30); }
       else if (t.hasAttribute('data-sound')) { snd.set(!snd.on); if (snd.on) snd.swish(.22, .35, 900, 4000); toast(snd.on ? 'Sound on. Every car has its real voice now.' : 'Muted. The cars will sulk quietly.', snd.on ? '🔊' : '🔇'); }
       else if (t.dataset.open) open(t.dataset.open);
       else if (t.dataset.tab) { tab = t.dataset.tab; renderDrawer(); }
       else if (t.dataset.qty) { const l = state.cart.find(x => x.id === t.dataset.qty); setQty(t.dataset.qty, (l ? l.qty : 0) + +t.dataset.d); }
-      else if (t.hasAttribute('data-checkout')) lead();
-      else if (t.hasAttribute('data-confetti')) confetti(e.clientX, e.clientY);
+      else if (t.hasAttribute('data-checkout')) lead({ via: 'Checkout' });
+      else if (t.hasAttribute('data-confetti')) { snd.horn(); confetti(e.clientX, e.clientY, 36, { quiet: 1 }); }
       else if (t.id === 'burger') { const on = document.documentElement.classList.toggle('menu-open'); t.setAttribute('aria-expanded', on); lockScroll(on); }
       else if (t.hasAttribute('data-close') || t.id === 'scrim') closeAll();
     });
@@ -927,5 +962,5 @@
   motion();
   eggs();
 
-  window.DIYcore = { ROOT, url, inr, card, stage, sfx, playSfx, hideSfx, pop, burst: pop, honk, add, wish, reward, rewardTotal, toast, confetti, poppers, rev, snd, go, lead, arrived, revealed, _tx: txDebug, open, closeAll, lockScroll, totals, state, store, byId, imgOf, priceOf, hrefOf, reduce, $, $$ };
+  window.DIYcore = { ROOT, url, inr, card, shelves, stage, sfx, playSfx, hideSfx, pop, burst: pop, honk, add, wish, reward, rewardTotal, toast, confetti, poppers, rev, snd, go, lead, arrived, revealed, _tx: txDebug, open, closeAll, lockScroll, totals, state, store, byId, imgOf, priceOf, hrefOf, reduce, $, $$ };
 })();

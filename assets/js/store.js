@@ -1,6 +1,6 @@
-/* Shop — the showroom carousel and the full, filterable grid */
+/* Shop — the showroom carousel and the five curated collections */
 (function () {
-  const { $, $$, url, inr, card, stage, sfx, playSfx, add, snd, byId, hrefOf, reduce } = DIYcore;
+  const { $, $$, url, inr, stage, sfx, playSfx, add, snd, byId, hrefOf, reduce } = DIYcore;
   const hasG = !!window.gsap && !reduce;
   const params = new URLSearchParams(location.search);
 
@@ -89,41 +89,19 @@
   if (window.ScrollTrigger) ScrollTrigger.create({ trigger: '#show', start: 'top top', end: 'bottom top+=80', onToggle: s => darkHdr(s.isActive), onLeave: () => setPaused(true), onEnterBack: () => setPaused(false) });
 
   /* =========================================================
-     FILTERS + GRID
+     THE COLLECTIONS: five curated shelves instead of one long grid
      ========================================================= */
-  let vibe = DIY.groups[params.get('v')] ? params.get('v') : 'all', level = params.get('level') || 'all', query = '';
-  const count = id => id === 'all' ? DIY.all.length : DIY.all.filter(p => p.groups.includes(id)).length;
-  $('#filters').innerHTML = Object.entries(DIY.groups).map(([id, n]) => `<button data-v="${id}" aria-pressed="${id === vibe}">${n}<sup>${count(id)}</sup></button>`).join('') +
-    `<span class="sp"></span><select id="lvl" aria-label="Difficulty"><option value="all">Any level</option><option>Intermediate</option><option>Intermediate–Advanced</option><option>Advanced</option></select>
-     <select id="sort" aria-label="Sort"><option value="feat">Garage order</option><option value="low">Price ↑</option><option value="high">Price ↓</option><option value="deal">Biggest discount</option></select>
-     <label class="sr" for="q">Search</label><input id="q" type="search" placeholder="Search Supra, F40, vroom…">`;
-  $('#lvl').value = level;
-  $('#grid').innerHTML = DIY.all.map(p => card(p)).join('');
-  function apply(anim = true) {
-    const grid = $('#grid'), st = anim && window.gsap && window.Flip ? Flip.getState($$('.kit', grid)) : null;
-    const s = $('#sort').value;
-    const list = [...DIY.all].sort((a, b) => s === 'low' ? a.salePrice - b.salePrice : s === 'high' ? b.salePrice - a.salePrice : s === 'deal' ? b.deal - a.deal : a.no - b.no);
-    let shown = 0;
-    list.forEach(p => {
-      const el = grid.querySelector(`[data-id="${p.id}"]`);
-      const ok = (vibe === 'all' || p.groups.includes(vibe)) && (level === 'all' || p.level === level) && (!query || (p.name + ' ' + p.tag + ' ' + p.sound).toLowerCase().includes(query));
-      el.classList.toggle('is-out', !ok); if (ok) shown++; grid.append(el);
+  $('#grid').innerHTML = DIYcore.shelves();
+  $('#colIndex').innerHTML = DIY.collections.map(k => `<a href="#col-${k.id}" style="--c:${k.color}"><b>${k.no}</b>${k.name}</a>`).join('');
+  // older links (?v=jdm) and footer links (#col-jdm) both land on the right shelf
+  const legacy = { jdm: 'jdm', hyper: 'flex', track: 'track', classic: 'poster', tuner: 'poster', gaming: 'track' }[params.get('v')];
+  const target = location.hash.startsWith('#col-') ? location.hash : legacy ? '#col-' + legacy : null;
+  if (target) addEventListener('load', () => setTimeout(() => { const t = $(target); if (t) window.lenis ? lenis.scrollTo(t, { offset: -90, immediate: true }) : t.scrollIntoView(); }, 200));
+  if (hasG) {
+    $$('.shelf').forEach(s => {
+      gsap.from($('.shelf__hd', s).children, { y: 40, opacity: 0, stagger: .08, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: s, start: 'top 88%', once: true } });
+      gsap.from($$('.kit', s), { y: 60, opacity: 0, rotation: i => (i % 2 ? 1.5 : -1.5), stagger: .07, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: $('.shelf__row', s), start: 'top 92%', once: true } });
     });
-    $('#count').textContent = `${shown} machine${shown === 1 ? '' : 's'} found`;
-    $('#none').hidden = shown > 0;
-    if (st) Flip.from(st, { targets: $$('.kit:not(.is-out)', grid), duration: .6, ease: 'power3.inOut', scale: true, stagger: .015, onEnter: el => gsap.fromTo(el, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .5 }) });
-    const u = new URL(location.href);
-    vibe === 'all' ? u.searchParams.delete('v') : u.searchParams.set('v', vibe);
-    level === 'all' ? u.searchParams.delete('level') : u.searchParams.set('level', level);
-    history.replaceState(null, '', u);
+    addEventListener('load', () => ScrollTrigger.refresh());
   }
-  $('#filters').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; vibe = b.dataset.v; $$('#filters [data-v]').forEach(x => x.setAttribute('aria-pressed', x === b)); apply(); });
-  $('#lvl').addEventListener('change', e => { level = e.target.value; apply(); });
-  $('#sort').addEventListener('change', () => apply());
-  $('#q').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); apply(false); });
-  apply(false);
-  // a vibe link (from the home page) jumps straight to the grid
-  if (params.get('v')) addEventListener('load', () => setTimeout(() => { const t = $('.bar'); window.lenis ? lenis.scrollTo(t, { immediate: true }) : t.scrollIntoView(); }, 200));
-
-  if (hasG) ScrollTrigger.batch('#grid .kit', { start: 'top 95%', onEnter: b => gsap.from(b, { y: 50, opacity: 0, stagger: .05, duration: .7, ease: 'power3.out', overwrite: true }) });
 })();

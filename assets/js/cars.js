@@ -198,23 +198,10 @@
   }, true);
 
   /* =========================================================
-     SHOP BY VIBE — Flip filter + sort
+     THE COLLECTIONS: the same five curated shelves as the shop
      ========================================================= */
-  let vibe = new URLSearchParams(location.search).get('v') || 'all';
-  if (!DIY.groups[vibe]) vibe = 'all';
-  $('#vibes').innerHTML = Object.entries(DIY.groups).map(([k, v]) => `<button role="tab" data-v="${k}" aria-selected="${k === vibe}">${v}<sup>${k === 'all' ? cars.length : cars.filter(c => c.groups.includes(k)).length}</sup></button>`).join('');
-  $('#grid').innerHTML = cars.map(c => card(c)).join('');
-  const lvl = { 'Intermediate': 1, 'Intermediate–Advanced': 2, 'Advanced': 3 };
-  function applyGrid(anim = true) {
-    const grid = $('#grid'), st = anim && window.gsap && window.Flip ? Flip.getState($$('.kit', grid)) : null;
-    const s = $('#sort').value;
-    const sorted = [...cars].sort((a, b) => s === 'deal' ? b.deal - a.deal : s === 'low' ? a.salePrice - b.salePrice : s === 'high' ? b.salePrice - a.salePrice : s === 'easy' ? lvl[a.level] - lvl[b.level] || a.pages - b.pages : s === 'big' ? b.length - a.length : a.no - b.no);
-    sorted.forEach(c => { const el = grid.querySelector(`[data-id="${c.id}"]`); el.classList.toggle('is-out', !(vibe === 'all' || c.groups.includes(vibe))); grid.append(el); });
-    if (st) Flip.from(st, { targets: $$('.kit:not(.is-out)', grid), duration: .7, ease: 'power3.inOut', scale: true, stagger: .02, onEnter: el => gsap.fromTo(el, { opacity: 0, scale: .9 }, { opacity: 1, scale: 1, duration: .5 }) });
-  }
-  $('#vibes').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; vibe = b.dataset.v; $$('#vibes button').forEach(x => x.setAttribute('aria-selected', x === b)); applyGrid(); });
-  $('#sort').addEventListener('change', () => applyGrid());
-  applyGrid(false);
+  $('#grid').innerHTML = DIYcore.shelves();
+  $('#colIndex').innerHTML = DIY.collections.map(k => `<a href="#col-${k.id}" style="--c:${k.color}"><b>${k.no}</b>${k.name}</a>`).join('');
 
   /* =========================================================
      SCRATCH CARD
@@ -369,7 +356,10 @@
   /* ---------- reveal the rest ---------- */
   $$('.shead h2, .quiz__h, .credit h2, .racer h2').forEach(h => gsap.from(h, { y: 60, opacity: 0, rotate: 2, duration: 1, ease: 'power4.out', scrollTrigger: { trigger: h, start: 'top 88%' } }));
   gsap.from('.ticket', { rotateX: -70, y: 60, opacity: 0, transformPerspective: 800, transformOrigin: 'top center', stagger: .1, duration: 1, ease: 'back.out(1.4)', scrollTrigger: { trigger: '.tickets', start: 'top 85%' } });
-  ScrollTrigger.batch('#grid .kit', { start: 'top 92%', onEnter: b => gsap.from(b, { y: 60, opacity: 0, stagger: .06, duration: .8, ease: 'power3.out', overwrite: true }) });
+  $$('.shelf').forEach(s => {
+    gsap.from($('.shelf__hd', s).children, { y: 40, opacity: 0, stagger: .08, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: s, start: 'top 88%', once: true } });
+    gsap.from($$('.kit', s), { y: 60, opacity: 0, stagger: .07, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: $('.shelf__row', s), start: 'top 92%', once: true } });
+  });
   gsap.from('.quiz__card', { rotate: 6, y: 80, opacity: 0, duration: 1, ease: 'back.out(1.4)', scrollTrigger: { trigger: '.quiz__card', start: 'top 85%' } });
   gsap.from('.bay3', { y: 60, opacity: 0, stagger: .1, duration: .8, scrollTrigger: { trigger: '#bays3', start: 'top 85%' } });
   gsap.from('.credit__in img', { scale: 0, rotate: -180, duration: 1.2, ease: 'back.out(2)', scrollTrigger: { trigger: '.credit', start: 'top 80%' } });

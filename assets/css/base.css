@@ -415,3 +415,33 @@ main > section, main > div, main > nav { overflow-x: clip; }
 .lead__done b { font-size: clamp(30px, 5vw, 46px); line-height: .95; font-weight: 400; color: var(--orange); }
 .lead__done p { margin: 0; max-width: 34ch; color: #4a4b45; }
 @media (max-width: 600px) { .lead { place-items: end center; padding: 0; } .lead__card { border-radius: 26px 26px 0 0; box-shadow: none; border-width: 2px 0 0; max-height: 92svh; } }
+
+/* ---------- the catalogue as curated shelves (shop + garage) ---------- */
+.shelves { display: grid; gap: clamp(56px, 10vh, 120px); }
+.shelf { position: relative; scroll-margin-top: 110px; }
+.shelf__hd { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: clamp(14px, 2.4vw, 40px); align-items: end; padding-bottom: clamp(16px, 2.4vh, 26px); margin-bottom: clamp(18px, 3vh, 30px); border-bottom: 2px solid currentColor; }
+.shelf__no { position: relative; z-index: 0; isolation: isolate; font-size: clamp(64px, calc(var(--u) * 9), 150px); line-height: .78; color: currentColor; }
+.shelf__no::after { content: ""; position: absolute; z-index: -1; left: 28%; bottom: 6%; width: 64%; height: 42%; border-radius: 6px; background: var(--c); transform: rotate(-4deg); }
+.shelf__txt .mono { color: #77786f; }
+.shelf__txt h3 { margin: 6px 0; font-size: clamp(30px, calc(var(--u) * 4.4), 72px); line-height: .9; }
+.shelf__txt p { margin: 0; max-width: 48ch; color: #55564f; line-height: 1.4; }
+.shelf__deal { display: grid; gap: 6px; justify-items: end; text-align: right; }
+.shelf__deal .mono { color: #77786f; }
+.shelf__deal b { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 2.2vw, 34px); }
+.shelf__deal s { color: #8a8a83; margin-left: 8px; }
+.shelf__row { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: clamp(14px, 1.8vw, 30px); }
+.shelf__row .kit__media { background: radial-gradient(120% 70% at 50% 100%, color-mix(in srgb, var(--c) 34%, #ece7dc) 0%, #f3f0e9 54%, #f7f5ef 100%); }
+.res__intro { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; margin-bottom: clamp(30px, 6vh, 64px); }
+.res__intro h2 { margin: 8px 0 0; font-size: var(--fs-h2); }
+.res__index { display: flex; flex-wrap: wrap; gap: 8px; }
+.res__index a { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 8px; border-radius: 99px; border: 1.5px solid var(--ink); font-weight: 700; font-size: 14px; transition: background .25s, color .25s; }
+.res__index a b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--c); font-family: var(--mono); font-size: 11px; }
+.res__index a:hover { background: var(--ink); color: var(--paper); }
+@media (max-width: 1100px) { .shelf__row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .shelf__hd { grid-template-columns: auto minmax(0, 1fr); }
+  .shelf__deal { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; text-align: left; }
+  .shelf__row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter) 10px; scrollbar-width: none; }
+  .shelf__row::-webkit-scrollbar { display: none; }
+  .shelf__row .kit { flex: 0 0 80%; scroll-snap-align: start; }
+}

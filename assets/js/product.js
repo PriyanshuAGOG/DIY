@@ -24,7 +24,7 @@
   $('#qtyMinus').addEventListener('click', () => setQty(qty - 1));
   $('#qtyPlus').addEventListener('click', () => setQty(qty + 1));
   $('#ppAdd').addEventListener('click', e => add(c.id, qty, e.currentTarget));
-  $('#ppBuy').addEventListener('click', e => { add(c.id, qty, e.currentTarget, true); DIYcore.lead(); }); // pre-launch: buying means joining the list
+  $('#ppBuy').addEventListener('click', e => { add(c.id, qty, e.currentTarget, true); DIYcore.lead({ via: 'Buy now (product page)', car: c.id }); }); // pre-launch: buying means joining the list
   setQty(1);
 
   /* =========================================================
@@ -159,24 +159,40 @@
   /* =========================================================
      FREQUENTLY BUILT TOGETHER
      ========================================================= */
-  const partners = cars.filter(x => x.ch === c.ch && x.id !== c.id).sort((a, b) => Math.abs(a.salePrice - c.salePrice) - Math.abs(b.salePrice - c.salePrice)).slice(0, 2);
+  // its collection-mates first (same shelf), then the closest-priced cars from the same chapter
+  const shelf = DIY.collections.find(k => k.id !== 'first' && k.cars.includes(c.id));
+  const mates = (shelf ? shelf.list : []).filter(x => x.id !== c.id);
+  const partners = [...mates, ...cars.filter(x => x.ch === c.ch && x.id !== c.id && !mates.includes(x)).sort((a, b) => Math.abs(a.salePrice - c.salePrice) - Math.abs(b.salePrice - c.salePrice))].slice(0, 2);
   const pick = { [c.id]: true }; partners.forEach(p => pick[p.id] = true);
+  // every kit in the bundle is shown and named; nothing goes in the bag that you can't see ticked
   function renderTogether() {
     const items = [c, ...partners];
     $('#together').innerHTML = items.map((p, k) => `${k ? '<span class="tg__plus" aria-hidden="true">+</span>' : ''}
-      <div class="tg ${pick[p.id] ? '' : 'off'}">
-        ${k ? `<label><input type="checkbox" data-tg="${p.id}" ${pick[p.id] ? 'checked' : ''}> Add</label>` : '<label><span class="mono">This kit</span></label>'}
-        ${stage(p)}<b>${p.name}</b><small>${inr(p.salePrice)} · ${p.scale}</small>
+      <label class="tg ${pick[p.id] ? '' : 'off'}" ${k ? '' : 'aria-disabled="true"'}>
+        <span class="tg__tick">${k ? `<input type="checkbox" data-tg="${p.id}" ${pick[p.id] ? 'checked' : ''}> ${pick[p.id] ? 'In the bundle' : 'Add to bundle'}` : '<span class="mono">This kit</span>'}</span>
+        ${stage(p)}<b>${p.name}</b><small>${inr(p.salePrice)} · ${p.scale} · ${p.level}</small>
         ${k ? `<a class="mono" href="${hrefOf(p)}">View kit →</a>` : ''}
-      </div>`).join('') + (() => {
+      </label>`).join('') + (() => {
       const sel = items.filter(p => pick[p.id]), n = sel.length, pct = n >= 3 ? 12 : n === 2 ? 5 : 0;
       const sale = sel.reduce((s, p) => s + p.salePrice, 0), mrp = sel.reduce((s, p) => s + p.price, 0), tot = sale * (1 - pct / 100);
-      return `<div class="tg__sum"><span class="mono">${n} kit${n > 1 ? 's' : ''} · garage bundle ${pct ? '−' + pct + '%' : 'off'}</span><b>${inr(tot)}</b><span><s>${inr(mrp)}</s> <span class="save">You save ${inr(mrp - tot)}</span></span><button class="btn btn--acid" id="tgAdd">Add ${n} to bag</button></div>`;
+      return `<div class="tg__sum"><span class="mono">${n} kit${n > 1 ? 's' : ''} · garage bundle ${pct ? '−' + pct + '%' : 'off'}</span>
+        <ul class="tg__list">${sel.map(p => `<li>${p.model}${p.sub ? ' ' + p.sub : ''}</li>`).join('')}</ul>
+        <b>${inr(tot)}</b><span><s>${inr(mrp)}</s> <span class="save">You save ${inr(mrp - tot)}</span></span>
+        <button class="btn btn--acid" id="tgAdd">${n === 1 ? 'Add this kit' : `Add these ${n}`} to bag</button></div>`;
     })();
-    $('#tgAdd').addEventListener('click', e => { items.filter(p => pick[p.id]).forEach(p => add(p.id, 1, e.currentTarget, true)); toast('Bundle parked in your bag.', '🏁', 'View bag', () => open('bag')); confetti(e.clientX, e.clientY, 30); });
+    $('#tgAdd').addEventListener('click', e => {
+      const sel = items.filter(p => pick[p.id]); sel.forEach((p, i) => add(p.id, 1, i ? null : e.currentTarget, true));
+      toast(`Parked in your bag: ${sel.map(p => p.model).join(', ')}.`, '🏁', 'View bag', () => open('bag')); confetti(e.clientX, e.clientY, 30);
+    });
   }
   $('#together').addEventListener('change', e => { const t = e.target.closest('[data-tg]'); if (!t) return; pick[t.dataset.tg] = t.checked; renderTogether(); });
   renderTogether();
+
+  /* ---------- pairs well with: single kits, each with its own buttons ---------- */
+  const pairs = [...mates, ...cars.filter(x => x.id !== c.id && !mates.includes(x) && x.groups.some(g => c.groups.includes(g)))].filter(x => !partners.includes(x)).slice(0, 4);
+  for (const x of cars) { if (pairs.length >= 4) break; if (x.id !== c.id && !partners.includes(x) && !pairs.includes(x)) pairs.push(x); }
+  $('#pairs').innerHTML = pairs.map(x => card(x)).join('');
+  if (shelf) $('#pairs').style.setProperty('--c', shelf.color);
 
   /* ---------- garage combos ---------- */
   let combos = DIY.combos.filter(k => k.cars.includes(c.id));
@@ -195,7 +211,8 @@
     .map(([ic, n, f, d]) => `<div class="jstep"><i>${ic}</i><b>${n}</b><small>${fmt(H * f)}</small><p>${d}</p></div>`).join('');
 
   /* ---------- more from the garage ---------- */
-  const more = cars.filter(x => x.id !== c.id).map(x => ({ x, s: x.groups.filter(g => c.groups.includes(g)).length + (x.ch === c.ch ? .5 : 0) })).sort((a, b) => b.s - a.s).slice(0, 4).map(o => o.x);
+  const seen = new Set([c, ...partners, ...pairs]);
+  const more = cars.filter(x => !seen.has(x)).map(x => ({ x, s: x.groups.filter(g => c.groups.includes(g)).length + (x.ch === c.ch ? .5 : 0) })).sort((a, b) => b.s - a.s).slice(0, 4).map(o => o.x);
   $('#more').innerHTML = more.map(x => card(x)).join('');
 
   /* ---------- prev / next ---------- */
@@ -215,8 +232,13 @@
   gsap.from('.pp-buy > *', { y: 30, opacity: 0, stagger: .05, duration: .8, ease: 'power3.out', delay: .1 });
   playSfx($('#ppSfx .sfx'), { delay: .5 });
   $$('.pp-sec .shead h2').forEach(h => gsap.from(h, { y: 50, opacity: 0, duration: 1, ease: 'power4.out', scrollTrigger: { trigger: h, start: 'top 88%' } }));
-  gsap.from('.tg, .tg__sum', { y: 40, opacity: 0, stagger: .08, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: '#together', start: 'top 85%' } });
-  gsap.from('.combo', { y: 50, opacity: 0, stagger: .1, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: '#combos', start: 'top 85%' } });
-  gsap.from('.jstep', { y: 30, opacity: 0, stagger: .08, duration: .7, ease: 'power3.out', scrollTrigger: { trigger: '#journey', start: 'top 85%' } });
-  ScrollTrigger.batch('#more .kit', { start: 'top 92%', onEnter: b => gsap.from(b, { y: 50, opacity: 0, stagger: .06, duration: .8, ease: 'power3.out', overwrite: true }) });
+  // reveals never leave content hidden: they only play once the block is actually reached, and a late
+  // layout shift (gallery images arriving) can never strand anything at opacity 0
+  const reveal = (sel, trigger, from) => ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => gsap.fromTo(sel, from, { y: 0, opacity: 1, stagger: .08, duration: .8, ease: 'power3.out', clearProps: 'transform,opacity' }) });
+  reveal('#together .tg, #together .tg__sum', '#together', { y: 40, opacity: 0 });
+  reveal('#pairs .kit', '#pairs', { y: 50, opacity: 0 });
+  reveal('.combo', '#combos', { y: 50, opacity: 0 });
+  reveal('.jstep', '#journey', { y: 30, opacity: 0 });
+  reveal('#more .kit', '#more', { y: 50, opacity: 0 });
+  addEventListener('load', () => ScrollTrigger.refresh());
 })();
