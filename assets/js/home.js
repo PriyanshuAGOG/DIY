@@ -79,7 +79,9 @@
 
   // pointer parallax: every paper layer at its own depth
   // the car's wrapper is driven by scroll, its stage by the pointer, its inner fit by the intro: three owners, never a tug-of-war
-  dream.layers.push({ el: $('#dreamTitle'), depth: .08 }, { el: $('#sun'), depth: .03 }, { el: carBox.querySelector('.stg'), depth: .34 });
+  // Tires and road share a fixed vertical baseline; the sky can still move in depth.
+  dream.layers.filter(l => ['road', 'front'].includes(l.name)).forEach(l => l.yDepth = 0);
+  dream.layers.push({ el: $('#dreamTitle'), depth: .08 }, { el: $('#sun'), depth: .03 }, { el: carBox.querySelector('.stg'), depth: .34, yDepth: 0 });
   DIYscene.parallax(dream, $('.dream__pin'), 46);
 
   /* =========================================================
@@ -247,7 +249,8 @@
     .to('#dreamTitle', { yPercent: -70, scale: 1.1, opacity: 0, duration: .38, ease: 'none' }, .04)
     .to('#planeSvg', { opacity: 0, duration: .15 }, .25)
     .set('#sun', { zIndex: 11 }, .46)
-    .to('#sun', { scale: sunCover, duration: .5, ease: 'power2.in' }, .48);
+    .to('#sun', { scale: sunCover, duration: .5, ease: 'power2.in' }, .48)
+    .to('.dream__handoff', { opacity: 1, duration: .1, ease: 'none' }, .88);
 
   // 2 · remember when: the bedroom pops up out of the sun's orange, the box lands on the rug, 3·2·1,
   //     and the camera rides the rocket up through the ceiling into a paper night sky

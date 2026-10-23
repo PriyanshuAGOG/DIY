@@ -18,7 +18,7 @@
   /* ---------- storage (never trusted to exist) ---------- */
   const store = {
     get(k, d) { try { const v = localStorage.getItem('diy.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem('diy.' + k, JSON.stringify(v)); } catch (e) {} }
+    set(k, v) { try { localStorage.setItem('diy.' + k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   };
   const state = {
     cart: store.get('cart', []).filter(l => byId(l.id)),
@@ -183,6 +183,7 @@
         </div>
       </div>`;
     document.body.append(...rest.children);
+    $('#drawer').inert = true; $('#lead').inert = true; // closed panels can't hold focus
 
     const ftr = $('#footer');
     if (ftr) ftr.outerHTML = `
@@ -194,9 +195,11 @@
               <p style="max-width:40ch;margin-top:16px">Flat paper. Your hands. The dream car you drew in the back of your notebook — now you can actually build it.</p>
               <form class="ftr__news" id="newsForm">
                 <label class="sr" for="news">Email</label>
-                <input id="news" type="email" required placeholder="you@curious.com">
+                <input id="news" name="email" type="email" autocomplete="email" maxlength="80" required placeholder="you@curious.com" aria-describedby="newsStatus">
+                <input class="lead__hp" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
                 <button class="btn btn--orange" type="submit">Join the club</button>
               </form>
+              <p class="ftr__news-status" id="newsStatus" role="status" aria-live="polite"></p>
             </div>
             <div><h4>THE GARAGE</h4><ul>
               <li><a href="${url('cars/automobiles/')}index.html">Paper garage</a></li>
@@ -213,7 +216,7 @@
               <li><a href="${url('')}index.html#how">How it works</a></li>
               <li><a href="mailto:hello@doityar.in">hello@doityar.in</a></li></ul></div>
           </div>
-          <div class="ftr__legal"><span>© ${new Date().getFullYear()} Do It Yar. Perfectly imperfect.</span><span>Car papercraft designs by Wong Hidayat (Wongday). Physical DIY kits by Do It Yar.</span></div>
+          <div class="ftr__legal"><span>© ${new Date().getFullYear()} Do It Yar. Perfectly imperfect.</span><span>Physical DIY kits designed and printed by Do It Yar.</span></div>
           <details class="credits"><summary class="mono">Sound credits: the real engines behind the noise</summary>
             <ul>${DIY.cars.map(c => c.snd ? `<li><b>${c.name}</b>: <a href="${c.snd.url}" target="_blank" rel="noopener">${c.snd.rec}</a> by ${c.snd.by}, ${c.snd.lic}${c.snd.exact ? ' (this exact car)' : ` <i>(stand-in: ${c.snd.why})</i>`}. Trimmed and levelled.</li>` : '').join('')}
             ${DIY.fxCredits.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener">${x.rec}</a> by ${x.by}, ${x.lic}</li>`).join('')}</ul></details>
@@ -295,15 +298,22 @@
   }
 
   /* ---------- drawer ---------- */
-  let tab = 'bag';
+  let tab = 'bag', drawerReturn = null;
+  function restoreFocus(el) {
+    const target = el && el.isConnected && el.matches('a[href],button,input,select,textarea,[tabindex]') && !el.closest('[inert], [hidden]') ? el : $('[data-open="bag"]');
+    if (target) target.focus({ preventScroll: true });
+  }
   function open(which) {
+    if (!$('#drawer').classList.contains('on')) drawerReturn = document.activeElement;
     tab = which; renderDrawer();
-    $('#drawer').classList.add('on'); $('#drawer').setAttribute('aria-hidden', 'false'); $('#scrim').classList.add('on');
+    $('#drawer').classList.add('on'); $('#drawer').setAttribute('aria-hidden', 'false'); $('#drawer').inert = false; $('#scrim').classList.add('on');
     lockScroll(true);
-    setTimeout(() => $('#drawer .x').focus(), 50);
+    setTimeout(() => { if ($('#drawer').classList.contains('on')) $('#drawer .x').focus(); }, 50);
   }
   function closeAll() {
-    $('#drawer').classList.remove('on'); $('#drawer').setAttribute('aria-hidden', 'true');
+    const drawer = $('#drawer');
+    if (drawer.contains(document.activeElement)) restoreFocus(drawerReturn);
+    drawer.classList.remove('on'); drawer.inert = true; drawer.setAttribute('aria-hidden', 'true');
     $('#scrim').classList.remove('on');
     document.documentElement.classList.remove('menu-open'); $('#burger').setAttribute('aria-expanded', 'false');
     document.dispatchEvent(new CustomEvent('diy:close'));
@@ -378,10 +388,9 @@
   }
   function poppers() {
     const h = innerHeight, w = innerWidth;
-    // the "what just happened" moment: an air horn, three volleys of paper, and a whole classroom going WOAH
+    // Synthesized pops and fizz only: these volleys cannot include recorded vocals.
     [0, 350, 700].forEach((d, k) => setTimeout(() => {
-      if (k === 0) snd.fx('airhorn', { at: .15, dur: 1.5, vol: .55, fout: .3 }); // BWAAAAP
-      if (k === 2) snd.fx('woah', { at: .45, dur: 3.7, vol: 1.1, fout: .5 }); // a whole classroom going WOAH
+      snd.party(k);
       confetti(0, h, 70, { angle: -58, spread: 34, power: 2.3, quiet: 1 });
       confetti(w, h, 70, { angle: -122, spread: 34, power: 2.3, quiet: 1 });
       if (k === 1) confetti(w / 2, h * .55, 90, { quiet: 1 });
@@ -459,6 +468,24 @@
       return false;
     }
     function fx(name, o = {}) { if (!allowed()) return; play('ui-' + name, { bus: fxBus, ...o }); }
+    function party(volley = 0) {
+      if (!allowed()) return;
+      const t = ac.currentTime + .01;
+      // Short, filtered noise bursts with a sharp attack, followed by falling confetti fizz.
+      const burst = (at, len, vol, freq) => {
+        const b = ac.createBuffer(1, Math.ceil(ac.sampleRate * len), ac.sampleRate), d = b.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+        const src = ac.createBufferSource(), filter = ac.createBiquadFilter(), gain = ac.createGain();
+        src.buffer = b; filter.type = 'bandpass'; filter.frequency.value = freq; filter.Q.value = .65;
+        gain.gain.setValueAtTime(0, at); gain.gain.linearRampToValueAtTime(vol, at + .002); gain.gain.exponentialRampToValueAtTime(.001, at + len);
+        src.connect(filter); filter.connect(gain); gain.connect(fxBus);
+        src.start(at); src.stop(at + len);
+        src.onended = () => { src.disconnect(); filter.disconnect(); gain.disconnect(); };
+      };
+      burst(t, .14, .8, 1500 + volley * 250);
+      burst(t + .075, .09, .45, 2400);
+      burst(t + .03, .65, .15, 5500);
+    }
     // a paper swish, synthesised (cheap, and it plays on the click that starts a transition)
     // the chaos button: a different silly horn every press
     function horn() { const [n, v] = [['horn-toodoo', .45], ['horn-honky', 2.2], ['horn-triple', .85]][Math.random() * 3 | 0]; fx(n, { vol: v, rate: .92 + Math.random() * .2 }); }
@@ -490,7 +517,7 @@
       document.body.classList.toggle('snd-off', !v);
     }
     ['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, () => { const c = ctx(); if (c && on && c.state !== 'running') c.resume().then(flush, () => {}); else if (queued) flush(); }, { capture: true, passive: true }));
-    return { car, fx, horn, swish, beep, engine, load, stopCar, set, allowed, ctx, get on() { return on; }, get bus() { return carBus; } };
+    return { car, fx, party, horn, swish, beep, engine, load, stopCar, set, allowed, ctx, get on() { return on; }, get bus() { return carBus; } };
   })();
 
   /* ---------- engine synth: only a fallback now, for a clip that cannot load ---------- */
@@ -770,7 +797,7 @@
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => word.addEventListener(ev, () => clearInterval(holdIv)));
       function tear() {
         torn = true; clearInterval(holdIv);
-        snd.fx('tear', { vol: 1, dur: 1.1 }); // the paper rips first, then the party
+        snd.swish(.22, .35, 2200, 650); // a paper rip without a voice recording
         tz.classList.add('torn');
         const H = tz.offsetHeight;
         if (window.gsap) {
@@ -792,7 +819,7 @@
     /* 2 — type "vroom" anywhere: a car drives across your screen, nose first */
     let typed = '';
     addEventListener('keydown', e => {
-      if (e.target.closest && e.target.closest('input,textarea,select')) return;
+      if (e.isComposing || typeof e.key !== 'string' || e.target.closest && e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
       typed = (typed + (e.key.length === 1 ? e.key.toLowerCase() : '')).slice(-12);
       if (typed.endsWith('vroom')) { typed = ''; driveBy(); }
       if (typed.endsWith('yaar')) { typed = ''; pop('DO IT, YAAR!', innerWidth / 2, innerHeight / 2); confetti(innerWidth / 2, innerHeight / 2, 50); }
@@ -832,7 +859,8 @@
     const code = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
     let ki = 0;
     addEventListener('keydown', e => {
-      const k = e.key.toLowerCase();
+      if (e.isComposing || typeof e.key !== 'string' || e.target.closest && e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+      const k = e.key.toLowerCase(); // browser autofill and IMEs can fire key-less events
       ki = k === code[ki] ? ki + 1 : (k === code[0] ? 1 : 0);
       if (ki === code.length) { ki = 0; poppers(); pop('CHEAT CODE!', innerWidth / 2, innerHeight / 2); reward('konami', 2, 'Secret code'); }
     });
@@ -848,33 +876,75 @@
     try { console.log('%cDO IT YAR%c\nYou opened devtools. Respect.\nType “vroom” on any page. Try the Konami code. And never stop scrolling at the bottom.', 'font:900 32px Arial Black;color:#ff641f', 'font:14px monospace;color:#888'); } catch (e) {}
   }
 
-  /* =========================================================
-     PRE-LAUNCH LEADS: "Buy now" and "Checkout" open a notify-me form. Submissions go through FormSubmit
-     (formsubmit.co), which emails each lead to the inbox below: no server, no account. The very first
-     submission makes FormSubmit send that inbox a one-time "activate this form" email; click it once and leads flow.
-     ========================================================= */
-  const LEADS_TO = 'chat.priyanshuag@gmail.com'; // after activating, swap in the private alias FormSubmit emails you, to keep the address off the page
-  let leadCtx = {};
+  /* Both forms use the inbox's existing Web3Forms public form key.
+     This is a browser-safe form identifier, not an email account credential. */
+  const LEADS_TO = 'chat.priyanshuag@gmail.com';
+  const LEADS_KEY = '79149bda-c2e2-41d5-a1fc-996e8922dfb1';
+  let leadFlush = null;
+  const savedLeads = store.get('leadq', []);
+  const pendingLeads = Array.isArray(savedLeads) ? savedLeads : [];
+  async function sendLead(body) {
+    const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const r = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST', signal: controller.signal,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ ...Object.fromEntries(Object.entries(body).filter(([k]) => k[0] !== '_')), access_key: LEADS_KEY, subject: body._subject, from_name: 'Do It Yar website', botcheck: false })
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !(j.success === true || j.success === 'true')) throw new Error(r.status === 429 ? 'Too many requests. Please try again in a few minutes.' : 'We couldn’t send your details. Please try again or email us directly.');
+      return true;
+    } catch (e) {
+      if (e.name === 'AbortError') throw new Error('Sending timed out. Please check your connection and try again.');
+      throw e;
+    } finally { clearTimeout(timeout); }
+  }
+  function flushLeads() {
+    if (leadFlush) return leadFlush;
+    leadFlush = (async () => {
+      while (pendingLeads.length) {
+        await sendLead(pendingLeads[0]);
+        pendingLeads.shift(); store.set('leadq', pendingLeads);
+      }
+      return true;
+    })().finally(() => { leadFlush = null; });
+    return leadFlush;
+  }
+  function queueLead(body) {
+    // Repeated clicks after a failed attempt retry the same submission.
+    const same = pendingLeads.find(p => p.email === body.email && p.phone === body.phone && p._subject === body._subject);
+    if (!same) pendingLeads.push({ ...body, 'submission id': crypto.randomUUID(), 'submitted at': new Date().toISOString() });
+    store.set('leadq', pendingLeads);
+    return flushLeads();
+  }
+  function deliveryError(el, error) {
+    el.textContent = error && error.message && error.name !== 'TypeError' ? error.message + ' ' : 'We couldn’t send your details. Check your connection and try again. ';
+    const a = document.createElement('a'); a.href = 'mailto:' + LEADS_TO; a.textContent = 'Email us directly'; el.append(a);
+  }
+  addEventListener('online', () => flushLeads().catch(() => {}));
+  let leadCtx = {}, leadReturn = null;
   function lead(o = {}) {
+    leadReturn = $('#drawer').classList.contains('on') ? drawerReturn : document.activeElement;
     leadCtx = o; // where the wish came from (which button, which car) travels with the lead
     closeAll();
     const t = totals(), picks = t.lines.length ? t.lines : state.wish.map(id => ({ p: byId(id), qty: 1 })).filter(l => l.p);
     $('#leadCars').innerHTML = picks.slice(0, 3).map(l => `<i>${stage(l.p, { alt: '' })}</i>`).join('');
     $('#leadTitle').textContent = picks.length === 1 ? `The ${picks[0].p.model} is almost yours.` : picks.length ? `${picks.reduce((s, l) => s + l.qty, 0)} machines. Excellent taste.` : 'Thank you for wanting these!';
     $('#leadBody').hidden = false; $('#leadDone').hidden = true; $('#leadErr').textContent = '';
-    const el = $('#lead'); el.classList.add('on'); el.setAttribute('aria-hidden', 'false'); lockScroll(true);
+    const el = $('#lead'); el.classList.add('on'); el.setAttribute('aria-hidden', 'false'); el.inert = false; lockScroll(true);
     if (window.gsap && !reduce) {
       gsap.fromTo('.lead__card', { y: 40, scale: .94, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: .55, ease: 'back.out(1.6)' });
       gsap.from('#leadCars i', { x: 90, opacity: 0, stagger: .08, duration: .8, ease: 'expo.out', delay: .1 });
     }
     snd.swish(.3, .4, 700, 3200);
-    setTimeout(() => $('#leadForm [name="name"]').focus(), 150);
+    setTimeout(() => { if (el.classList.contains('on')) $('#leadForm [name="name"]').focus(); }, 150);
   }
-  function leadClose() { const el = $('#lead'); if (!el.classList.contains('on')) return; el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); lockScroll(false); }
+  function leadClose() { const el = $('#lead'); if (!el.classList.contains('on')) return; if (el.contains(document.activeElement)) restoreFocus(leadReturn); el.classList.remove('on'); el.inert = true; el.setAttribute('aria-hidden', 'true'); lockScroll(false); }
   function leadForm() {
     const f = $('#leadForm'), err = $('#leadErr'), go = $('#leadGo'), label = go.firstChild.textContent;
     f.addEventListener('submit', async e => {
       e.preventDefault();
+      if (go.disabled) return;
       const v = Object.fromEntries(new FormData(f));
       const name = (v.name || '').trim(), phone = (v.phone || '').replace(/[^\d+]/g, ''), email = (v.email || '').trim();
       const bad = name.length < 2 ? ['name', 'Tell us your name, so we know who to cheer for.']
@@ -898,16 +968,13 @@
         _subject: `New lead: ${name} · ${t.lines.length ? t.lines.map(l => l.p.model).join(', ') : wl.length ? 'wishlist ' + wl.map(p => p.model).join(', ') : 'just curious'}`,
         _template: 'table', _captcha: 'false'
       });
-      let ok = false;
-      try {
-        const r = await fetch('https://formsubmit.co/ajax/' + LEADS_TO, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
-        const j = await r.json().catch(() => ({}));
-        ok = r.ok && (String(j.success) === 'true' || /activat/i.test(j.message || '')); // before activation FormSubmit answers "needs activation": the visitor still did everything right
-      } catch (er) {}
-      go.disabled = false; go.firstChild.textContent = label;
-      if (!ok) { err.textContent = 'Couldn’t reach our mailroom. Check your connection and try once more?'; return; }
+      try { await queueLead(body); }
+      catch (error) { deliveryError(err, error); return; }
+      finally { go.disabled = false; go.firstChild.textContent = label; }
       store.set('lead', 1); f.reset();
+      if ($('#leadBody').contains(document.activeElement)) $('#lead .lead__x').focus();
       $('#leadBody').hidden = true; $('#leadDone').hidden = false;
+      if ($('#lead').classList.contains('on')) $('#leadDone button').focus();
       const r = $('.lead__card').getBoundingClientRect(); confetti(r.left + r.width / 2, r.top + 80, 60);
       if (window.gsap && !reduce) gsap.from('#leadDone > *', { y: 24, opacity: 0, stagger: .08, duration: .5, ease: 'back.out(2)' });
     });
@@ -951,7 +1018,25 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
     $$('#mnav a').forEach(a => a.addEventListener('click', () => closeAll()));
     const nf = $('#newsForm');
-    if (nf) nf.addEventListener('submit', e => { e.preventDefault(); toast('You’re in the club. Expect paper cuts of joy.', '✳'); nf.reset(); });
+    if (nf) nf.addEventListener('submit', async e => {
+      e.preventDefault();
+      const button = $('button', nf), status = $('#newsStatus'), email = $('#news').value.trim();
+      if (button.disabled || $('[name="_honey"]', nf).value || !nf.reportValidity()) return;
+      button.disabled = true; status.textContent = 'Sending…';
+      try {
+        await queueLead({ email, 'request': 'Chaos Club launch updates', 'page': location.pathname, _subject: 'New Chaos Club signup: ' + email });
+        status.textContent = 'You’re on the list. We’ll email you when the garage opens.'; nf.reset();
+      } catch (error) { deliveryError(status, error); }
+      finally { button.disabled = false; }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const panel = $('#lead.on') || $('#drawer.on'); if (!panel) return;
+      const focusable = $$('a[href],button,input,select,textarea,[tabindex="0"]', panel).filter(el => !el.disabled && el.tabIndex >= 0 && el.getClientRects().length && !el.closest('[hidden], [inert]'));
+      const first = focusable[0], last = focusable[focusable.length - 1]; if (!first) return;
+      if (e.shiftKey && (document.activeElement === first || !panel.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (document.activeElement === last || !panel.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+    });
   }
 
   chrome();

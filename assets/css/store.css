@@ -13,7 +13,7 @@
 .show__car, .show__plat { position: absolute; z-index: 2; right: 3vw; bottom: 22vh; width: min(48vw, calc(42vh * 2.2), 1100px); aspect-ratio: 2.2; touch-action: pan-y; }
 .show__car .stg { position: absolute; inset: 0; z-index: 1; }
 /* the turntable: every featured car stands on a lit plinth, so nothing hovers over the scenery */
-.show__deck { position: absolute; z-index: 0; left: -7%; right: -7%; bottom: 0; aspect-ratio: 4.4; translate: 0 40%; border-radius: 50%;
+.show__deck { position: absolute; z-index: 0; left: -9%; right: -9%; bottom: 0; aspect-ratio: 2.8; translate: 0 12%; border-radius: 50%;
   background: radial-gradient(50% 50% at 50% 46%, #4a4b44 0%, #34352f 55%, #272823 78%, #1d1e1a 100%);
   box-shadow: 0 clamp(8px, 1.1vw, 16px) 0 #121311, 0 clamp(8px, 1.1vw, 16px) 0 1px rgba(247,245,239,.12), inset 0 2px 0 rgba(247,245,239,.18), 0 30px 50px rgba(0,0,0,.55); overflow: hidden; }
 .show__deck::before { content: ""; position: absolute; inset: 9% 6%; border-radius: 50%; border: 1px dashed rgba(247,245,239,.18); animation: spinDeck 14s linear infinite; }

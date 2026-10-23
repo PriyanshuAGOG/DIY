@@ -77,7 +77,7 @@
         return s;
       },
       mid(W, r) {
-        const gy = x => 668 + Math.sin(x / 300) * 26 + Math.sin(x / 97) * 6;
+        const gy = x => 600 + Math.sin(x / 300) * 22 + Math.sin(x / 97) * 6;
         const pts = []; for (let x = -20; x <= W + 140; x += 120) pts.push([x, gy(x)]);
         let s = poly([[-20, H], ...pts, [W + 140, H]].map(([x, y]) => [x, y + 8]), 'rgba(0,0,0,.08)');
         s += poly([[-20, H], ...pts, [W + 140, H]], '#bfe9d3');
@@ -91,8 +91,8 @@
         return s;
       },
       road(W) {
-        // a tall road: the hero's words sit on its left, the car drives on its right
-        let s = `<rect x="0" y="694" width="${W}" height="30" fill="#9bd6bd"/><rect x="0" y="716" width="${W}" height="${H - 716}" fill="#2a2b28"/><rect x="0" y="716" width="${W}" height="6" fill="#f7f5ef"/>`;
+        // a deep road: the hero's words sit on its left, the car drives on its right, and the whole car (rear wheels too) is on tarmac
+        let s = `<rect x="0" y="606" width="${W}" height="40" fill="#9bd6bd"/><rect x="0" y="636" width="${W}" height="${H - 636}" fill="#2a2b28"/><rect x="0" y="636" width="${W}" height="6" fill="#f7f5ef"/>`;
         for (let x = Math.round(W * .5); x < W; x += 120) s += `<rect x="${x}" y="872" width="64" height="7" fill="#c5ef41"/>`;
         return s;
       },
@@ -218,13 +218,13 @@
       mid(W) {
         let s = '';
         for (let x = 60; x < W; x += 420) s += `<rect x="${x}" y="34" width="260" height="10" rx="5" fill="#f7f5ef"/><rect x="${x - 20}" y="44" width="300" height="60" fill="#f7f5ef" opacity=".04"/>`;
-        [0, W - 60].forEach(x => { s += `<rect x="${x}" y="0" width="60" height="${H}" fill="#232420"/>`; for (let y = 700; y < H; y += 40) s += poly([[x, y], [x + 60, y - 30], [x + 60, y - 10], [x, y + 20]], '#c5ef41', 'opacity=".85"'); });
+        [0, W - 60].forEach(x => { s += `<rect x="${x}" y="0" width="60" height="${H}" fill="#232420"/>`; for (let y = 620; y < H; y += 40) s += poly([[x, y], [x + 60, y - 30], [x + 60, y - 10], [x, y + 20]], '#c5ef41', 'opacity=".85"'); });
         return s;
       },
       ground(W) {
-        let s = `<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262722"/><stop offset="1" stop-color="#121311"/></linearGradient></defs><rect x="0" y="700" width="${W}" height="${H - 700}" fill="url(#gf)"/><rect x="0" y="700" width="${W}" height="3" fill="#3a3b36"/>`;
+        let s = `<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262722"/><stop offset="1" stop-color="#121311"/></linearGradient></defs><rect x="0" y="620" width="${W}" height="${H - 620}" fill="url(#gf)"/><rect x="0" y="620" width="${W}" height="3" fill="#3a3b36"/>`;
         const bx = W * .52, bw = W * .44;
-        s += `<polygon points="${bx + 40},708 ${bx + bw - 40},708 ${bx + bw + 30},${H} ${bx - 30},${H}" fill="none" stroke="#c5ef41" stroke-width="5" opacity=".75"/>`;
+        s += `<polygon points="${bx + 40},628 ${bx + bw - 40},628 ${bx + bw + 30},${H} ${bx - 30},${H}" fill="none" stroke="#c5ef41" stroke-width="5" opacity=".75"/>`;
         s += `<text x="${bx + bw / 2}" y="${H - 18}" text-anchor="middle" font-family="Archivo Black, Arial Black, sans-serif" font-size="120" fill="none" stroke="#c5ef41" stroke-width="2.5" opacity=".35">01</text>`;
         return s;
       }
@@ -388,7 +388,7 @@
   // pointer parallax for a built scene (desktop only)
   function parallax(scene, area, amt = 60) {
     if (!window.gsap || !matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const movers = scene.layers.map(L => ({ x: gsap.quickTo(L.el, 'x', { duration: 1, ease: 'power3' }), y: gsap.quickTo(L.el, 'y', { duration: 1, ease: 'power3' }), d: L.depth }));
+    const movers = scene.layers.map(L => ({ x: gsap.quickTo(L.el, 'x', { duration: 1, ease: 'power3' }), y: gsap.quickTo(L.el, 'y', { duration: 1, ease: 'power3' }), d: L.depth, yd: L.yDepth ?? L.depth }));
     // one layout read when the pointer arrives, one update per frame at most (no layout thrash on fast mice)
     let r = null, ev = null, queued = false;
     area.addEventListener('pointerenter', () => { r = area.getBoundingClientRect(); });
@@ -398,7 +398,7 @@
       requestAnimationFrame(() => {
         queued = false; r = r || area.getBoundingClientRect();
         const mx = (ev.clientX - r.left) / r.width - .5, my = (ev.clientY - r.top) / r.height - .5;
-        movers.forEach(m => { m.x(-mx * amt * m.d * 2); m.y(-my * amt * m.d); });
+        movers.forEach(m => { m.x(-mx * amt * m.d * 2); m.y(-my * amt * m.yd); });
       });
     });
   }

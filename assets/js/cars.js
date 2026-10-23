@@ -13,7 +13,7 @@
      ========================================================= */
   const entryCar = byId('lamborghini-aventador-lbwk');
   DIYscene.build($('#entryScene'), 'garage', { seed: 3, over: .06 });
-  $('#entryCar').innerHTML = stage(entryCar, { full: true, eager: true, alt: 'White Lamborghini Aventador LBWK papercraft model parked in the garage' });
+  $('#entryCar').innerHTML = '<i class="entry__deck" aria-hidden="true"></i>' + stage(entryCar, { full: true, eager: true, alt: 'White Lamborghini Aventador LBWK papercraft model parked in the garage' });
   $('#entrySfx').innerHTML = sfx(entryCar.shout, { face: entryCar.face, dark: true });
   hideChars($('#entrySfx'));
   $('#entryCar').addEventListener('click', e => honk(entryCar, e.clientX, e.clientY - 40));

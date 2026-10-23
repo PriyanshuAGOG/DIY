@@ -14,8 +14,9 @@
 .entry { position: relative; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; }
 .entry__scene { position: absolute; inset: 0; z-index: 0; }
 .entry::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(18,19,17,.92) 0%, rgba(18,19,17,.7) 32%, rgba(18,19,17,0) 56%); }
-.entry__car { position: absolute; z-index: 2; right: 3vw; bottom: 7vh; width: min(46vw, calc(44vh * 1.981), 1100px); aspect-ratio: 1.981; cursor: pointer; }
+.entry__car { position: absolute; z-index: 2; right: 3vw; bottom: 8vh; width: min(46vw, calc(44vh * 1.981), 1100px); aspect-ratio: 1.981; cursor: pointer; }
 .entry__car .stg { position: absolute; inset: 0; }
+.entry__deck { position: absolute; left: -9%; right: -9%; bottom: -3%; aspect-ratio: 2.8; border-radius: 50%; background: radial-gradient(ellipse at 50% 42%, #44463d, #292b24 60%, #1c1e19); box-shadow: 0 10px 0 #10120e, inset 0 2px 0 rgba(247,245,239,.16), 0 22px 36px rgba(0,0,0,.4); }
 .entry__sfx { position: absolute; z-index: 3; right: 6vw; bottom: calc(7vh + min(23.2vw, 44vh) + 2vh); font-size: clamp(36px, calc(var(--u) * 6.4), 130px); }
 .entry__copy { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: calc(var(--bar-h) + var(--header-h)); padding-bottom: 3vh; max-width: var(--wrap); }
 .entry__copy > * { max-width: 44vw; }

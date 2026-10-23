@@ -53,8 +53,10 @@
     { rec: 'ZIPPER', by: 'AndreaM84', lic: 'CC0', url: FS + '250586/' },
     { rec: 'RollerShutter_IT', by: 'uniuniversal', lic: 'CC0', url: FS + '617980/' },
     { rec: 'Garage Door Closes', by: 'dannydandanshababaloo', lic: 'CC0', url: FS + '593200/' },
-    { rec: 'S026_Airhorn_Bright_Sound_Mono', by: 'Pól', lic: 'CC0', url: FS + '385922/' },
-    { rec: 'kids_WOAH', by: 'DesignDean', lic: 'CC0', url: FS + '397317/' },
+    { rec: 'partypopper', by: 'Streety', lic: 'CC0', url: FS + '26349/' },
+    { rec: 'Balloon Pop / Christmas cracker / Confetti Cannon', by: 'Breviceps', lic: 'CC0', url: FS + '458398/' },
+    { rec: 'Popping the cork off a champagne bottle', by: 'Kate_is_yellow', lic: 'CC0', url: FS + '708201/' },
+    { rec: 'Firecracker', by: 'SamsterBirdies', lic: 'CC0', url: FS + '506982/' },
     { rec: 'Horn 1 (Too-doo Clown)', by: 'FunWithSound', lic: 'CC0', url: FS + '608085/' },
     { rec: 'Honky!', by: 'clubpegiunbint', lic: 'CC0', url: FS + '662393/' },
     { rec: 'Bicycle / Bike Horn - Triple Honk 3', by: 'manofham', lic: 'CC0', url: FS + '700138/' },
@@ -90,7 +92,7 @@
       side: `assets/side/${c.id}.webp`,    // side profile sprite, always nose-left
       cutout: `assets/stand/${c.id}.webp?v=2`,
       href: `products/${c.id}/index.html`,
-      credit: 'Papercraft design by Wong Hidayat (Wongday). Physical DIY kit by Do It Yar.',
+      credit: 'Designed and printed by Do It Yar.',
       snd: sounds[c.id], vol: c.id === 'rolls-royce-phantom' ? .7 : 1
     });
   });

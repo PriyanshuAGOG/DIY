@@ -22,8 +22,9 @@ body[data-page="home"] { background: #fbf3e4; }
 @media (max-width: 900px) { .trail { display: none; } }
 
 /* ---------- 1 · the paper dream ---------- */
-.dream { position: relative; }
-.dream__pin { position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+.dream { position: relative; background: var(--orange); }
+.dream__pin { position: relative; height: 100svh; min-height: 560px; overflow: hidden; background: #fbf3e4; }
+.dream__handoff { position: absolute; inset: 0; z-index: 12; background: var(--orange); opacity: 0; pointer-events: none; }
 .dream__scene { perspective: 1400px; }
 .dream__scene .scn__l--clouds { z-index: 2; }
 .dream__scene .scn__l--far { z-index: 4; }
@@ -36,7 +37,7 @@ body[data-page="home"] { background: #fbf3e4; }
 .dream__title .o { color: var(--orange); }
 .dream__title .w { display: inline-block; }
 .dream__title .c { display: inline-block; transform-origin: 50% 100%; }
-.dream__car { position: absolute; z-index: 7; right: 5%; bottom: 6.5%; width: min(46vw, 96vh, 1000px); aspect-ratio: 2.741; cursor: pointer; outline: none; }
+.dream__car { position: absolute; z-index: 7; right: 5%; bottom: 4.5%; width: min(46vw, 96vh, 1000px); aspect-ratio: 2.741; cursor: pointer; outline: none; }
 .dream__car .stg { position: absolute; inset: 0; }
 .dream__car .stg__shadow { bottom: -3%; height: 12%; }
 .dream__plane { position: absolute; inset: 0; z-index: 9; width: 100%; height: 100%; pointer-events: none; }
@@ -59,7 +60,7 @@ body[data-page="home"] { background: #fbf3e4; }
 }
 
 /* ---------- 2 · remember when ---------- */
-.child { position: relative; color: var(--ink); }
+.child { position: relative; color: var(--ink); background: var(--orange); } /* the sun hands over to this exact orange: no cream strip can show between them */
 .child__pin { position: relative; height: 100svh; min-height: 560px; display: grid; align-items: center; overflow: hidden; }
 /* the bedroom diorama and the night sky behind it (the sky is revealed when the room drops away) */
 .child__sky, .child__room { position: absolute; inset: 0; }
@@ -170,14 +171,14 @@ body[data-page="home"] { background: #fbf3e4; }
 .cf__head .btn--ghost { color: var(--paper); }
 .cf__stage { position: relative; z-index: 1; perspective: 1800px; }
 /* the plinth the hero car stands on: a lit turntable with a slow dashed ring, plus a soft spotlight from above */
-.cf__floor { position: absolute; left: 50%; bottom: 1%; width: calc(var(--iw, 600px) * 1.08); aspect-ratio: 3.8; translate: -50% 0; border-radius: 50%;
+.cf__floor { position: absolute; left: 50%; bottom: 1%; width: calc(var(--iw, 600px) * 1.18); aspect-ratio: 2.6; translate: -50% 0; border-radius: 50%;
   background: radial-gradient(50% 50% at 50% 44%, #3d3e38 0%, #2c2d28 58%, #20211d 82%, #181915 100%);
   box-shadow: 0 clamp(8px, 1vw, 14px) 0 #0c0d0b, inset 0 2px 0 rgba(247,245,239,.16), 0 34px 60px rgba(0,0,0,.6); }
 .cf__floor::before { content: ""; position: absolute; inset: 10% 7%; border-radius: 50%; border: 1px dashed rgba(247,245,239,.16); animation: cfSpin 18s linear infinite; }
 .cf__floor::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: 30%; height: 900%; background: linear-gradient(180deg, transparent, rgba(255,246,220,.06) 50%, rgba(255,246,220,.12)); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); pointer-events: none; }
 @keyframes cfSpin { to { transform: rotate(360deg); } }
 .cf__ring { position: absolute; inset: 0; transform-style: preserve-3d; }
-.cf__item { position: absolute; left: 50%; bottom: calc(1% + var(--iw, 600px) * .085); transform-origin: 50% 100%; width: var(--iw, 600px); aspect-ratio: 2.2; margin-left: calc(var(--iw, 600px) / -2); cursor: pointer; will-change: transform, opacity; }
+.cf__item { position: absolute; left: 50%; bottom: calc(1% + var(--iw, 600px) * .035); transform-origin: 50% 100%; width: var(--iw, 600px); aspect-ratio: 2.2; margin-left: calc(var(--iw, 600px) / -2); cursor: pointer; will-change: transform, opacity; }
 .cf__item .stg { position: absolute; inset: 0; }
 .cf__info { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
 .cf__meta .mono { color: #9a9a92; }
