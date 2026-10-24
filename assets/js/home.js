@@ -13,8 +13,10 @@
   const dream = DIYscene.build($('#dreamScene'), 'dream', { seed: 11, over: .12 });
   const L = n => dream.layers.find(l => l.name === n).el;
   const carBox = $('#dreamCar');
-  carBox.style.aspectRatio = hero.ar;
-  carBox.innerHTML = stage(hero, { full: true, eager: true, alt: 'Red Ferrari F40 papercraft model on a paper road' });
+  // the hero car is seen from the side, so on scroll it genuinely drives along the road (nose left, wheels on one line)
+  const heroSide = Object.assign({}, hero, { cut: 'assets/stand/f40-side-hero.webp?v=1', ar: 2.793 });
+  carBox.style.aspectRatio = heroSide.ar;
+  carBox.innerHTML = stage(heroSide, { full: true, eager: true, alt: 'Red Ferrari F40 papercraft model driving along a paper road' }) + '<div class="dream__speed" aria-hidden="true">' + [0, 1, 2, 3, 4].map(() => '<i></i>').join('') + '</div>';
   $$('#dreamTitle .w').forEach(w => { w.innerHTML = [...w.textContent].map(ch => `<span class="c">${ch}</span>`).join(''); });
 
   const honkHero = () => {
@@ -252,7 +254,16 @@
     return far / (r.width / 2) * 1.08;
   };
   [L('front'), L('road'), L('mid'), L('far')].forEach(el => gsap.set(el, { transformOrigin: '50% 100%' }));
-  gsap.timeline({ scrollTrigger: { trigger: '.dream__pin', start: 'top top', end: '+=150%', pin: true, scrub: .8, invalidateOnRefresh: true } })
+  // speed: the faster you scroll, the more the car bounces on its springs, noses up and trails speed lines
+  const carImg = carBox.querySelector('.stg__img'), lines = $$('.dream__speed i', carBox);
+  gsap.set(lines, { scaleX: 0, transformOrigin: '0 50%' });
+  gsap.timeline({ scrollTrigger: { trigger: '.dream__pin', start: 'top top', end: '+=150%', pin: true, scrub: .8, invalidateOnRefresh: true,
+    onUpdate: s => {
+      const v = Math.min(1, Math.abs(s.getVelocity()) / 1800), moving = s.progress > .01 && s.progress < .5 ? 1 : 0, k = v * moving;
+      gsap.set(carImg, { y: Math.sin(performance.now() / 34) * 3.2 * k, rotation: -1.4 * k, transformOrigin: '50% 100%' });
+      gsap.to(lines, { scaleX: k, opacity: k * .9, duration: .25, overwrite: 'auto', stagger: .02 });
+    },
+    onLeave: () => gsap.set(carImg, { y: 0, rotation: 0 }), onLeaveBack: () => gsap.set(carImg, { y: 0, rotation: 0 }) } })
     .to(['#dreamUi', '#dreamHint'], { opacity: 0, y: 30, duration: .12 }, 0)
     .to(carBox, { x: () => -innerWidth * 1.15, skewX: 12, duration: .42, ease: 'power2.in' }, .03)
     .to(L('front'), { scale: 2, yPercent: 32, duration: .6, ease: 'none' }, 0)

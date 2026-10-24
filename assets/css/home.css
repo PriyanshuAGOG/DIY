@@ -37,7 +37,7 @@ body[data-page="home"] { background: #fbf3e4; }
 .dream__title .o { color: var(--orange); }
 .dream__title .w { display: inline-block; }
 .dream__title .c { display: inline-block; transform-origin: 50% 100%; }
-.dream__car { position: absolute; z-index: 7; right: 5%; bottom: 4.5%; width: min(46vw, 96vh, 1000px); aspect-ratio: 2.741; cursor: pointer; outline: none; }
+.dream__car { position: absolute; z-index: 7; right: 4%; bottom: 9%; width: min(52vw, 118vh, 1000px); aspect-ratio: 2.741; cursor: pointer; outline: none; }
 .dream__car .stg { position: absolute; inset: 0; }
 .dream__car .stg__shadow { bottom: -3%; height: 12%; }
 .dream__plane { position: absolute; inset: 0; z-index: 9; width: 100%; height: 100%; pointer-events: none; }
@@ -53,7 +53,7 @@ body[data-page="home"] { background: #fbf3e4; }
   .dream__title .w { display: block; }
   .dream__title .br { display: none; }
   .dream__sun { right: 6%; top: 7%; width: 26vw; }
-  .dream__car { width: min(88vw, 50vh); right: 6vw; bottom: clamp(16%, calc(215px + 3%), 31%); } /* sits just above the words block, whatever the screen height */
+  .dream__car { width: min(96vw, 84vh); right: 2vw; bottom: clamp(16%, calc(215px + 3%), 31%); } /* sits just above the words block, whatever the screen height */
   .dream__hint { display: none; }
   .dream__ui p { max-width: 30ch; }
   .dream__ui .btn { min-height: 42px; padding: 0 16px; font-size: 14px; }
@@ -343,3 +343,10 @@ body[data-page="home"] { background: #fbf3e4; }
 }
 @keyframes cloudDrift { from { translate: -4% 0; } to { translate: 4% 0; } }
 @keyframes sunTurn { to { rotate: 360deg; } }
+
+/* the hero car, side-on: a wide low shape that idles with an engine shudder and trails speed lines when it moves */
+.dream__car .stg__img { animation: engineIdle .13s linear infinite alternate; }
+@keyframes engineIdle { from { translate: 0 0; } to { translate: 0 -.7px; } }
+.dream__speed { position: absolute; left: 94%; bottom: 8%; width: 34%; height: 56%; pointer-events: none; z-index: 0; }
+.dream__speed i { position: absolute; left: 0; height: 3px; border-radius: 3px; background: rgba(247,245,239,.7); opacity: 0; width: 100%; }
+.dream__speed i:nth-child(1) { top: 12%; width: 70%; } .dream__speed i:nth-child(2) { top: 30%; width: 100%; } .dream__speed i:nth-child(3) { top: 48%; width: 82%; } .dream__speed i:nth-child(4) { top: 66%; width: 100%; } .dream__speed i:nth-child(5) { top: 84%; width: 60%; }
