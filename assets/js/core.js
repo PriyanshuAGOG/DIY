@@ -7,7 +7,10 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const url = p => ROOT + p;
   const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Motion is on for everyone. Phones often have the OS "reduce motion" flag switched on by battery saver, which used to
+  // turn the whole site static. Now only the visitor's own "Calm motion" switch (footer) turns the animations off.
+  const reduce = (() => { try { return localStorage.getItem('diy.calm') === 'true'; } catch (e) { return false; } })();
+  if (reduce) document.documentElement.classList.add('calm');
   const byId = id => DIY.all.find(p => p.id === id);
   const imgOf = p => url(p.thumb);
   const priceOf = p => p.salePrice || p.price;
@@ -217,6 +220,7 @@
               <li><a href="mailto:hello@doityar.in">hello@doityar.in</a></li></ul></div>
           </div>
           <div class="ftr__legal"><span>© ${new Date().getFullYear()} Do It Yar. Perfectly imperfect.</span><span>Physical DIY kits designed and printed by Do It Yar.</span></div>
+          <button class="calm-btn mono" id="calmBtn" type="button" aria-pressed="false">Calm motion: <b>off</b></button>
           <details class="credits"><summary class="mono">Sound credits: the real engines behind the noise</summary>
             <ul>${DIY.cars.map(c => c.snd ? `<li><b>${c.name}</b>: <a href="${c.snd.url}" target="_blank" rel="noopener">${c.snd.rec}</a> by ${c.snd.by}, ${c.snd.lic}${c.snd.exact ? ' (this exact car)' : ` <i>(stand-in: ${c.snd.why})</i>`}. Trimmed and levelled.</li>` : '').join('')}
             ${DIY.fxCredits.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener">${x.rec}</a> by ${x.by}, ${x.lic}</li>`).join('')}</ul></details>
@@ -1044,6 +1048,10 @@
   leadForm();
   sync();
   snd.set(snd.on);
+  { // the one switch for motion: remembered, and it reloads so every animation starts (or stops) cleanly
+    const b = $('#calmBtn'); if (b) { b.setAttribute('aria-pressed', reduce); $('b', b).textContent = reduce ? 'on' : 'off'; b.addEventListener('click', () => { try { localStorage.setItem('diy.calm', String(!reduce)); } catch (e) {} location.reload(); }); }
+    if (window.ScrollTrigger) ScrollTrigger.config({ ignoreMobileResize: true }); // the phone's address bar sliding in and out never re-lays-out the pinned scenes
+  }
   motion();
   eggs();
 

@@ -124,9 +124,9 @@
   }
   function sizeItems() {
     const st = $('#cfStage').getBoundingClientRect(), narrow = innerWidth < 760;
-    const iw = Math.max(240, Math.min(st.width * (narrow ? .8 : .44), st.height * 1.7, 980)); // car + plinth always fit the stage height
+    const iw = Math.max(240, Math.min(st.width * (narrow ? .98 : .44), st.height * 1.7, 980)); // car + plinth always fit the stage height
     $('.cf').style.setProperty('--iw', iw + 'px');
-    spacing = narrow ? innerWidth * .74 : Math.max(iw * .82, Math.min(innerWidth * .38, iw * .95)); // neighbours never touch the hero car
+    spacing = narrow ? innerWidth * .8 : Math.max(iw * .82, Math.min(innerWidth * .38, iw * .95)); // neighbours never touch the hero car
     layout(f);
   }
   function setInfo(i) {
@@ -170,6 +170,13 @@
     if (e.key === 'ArrowRight') goTo(idx + 1);
     if (e.key === 'ArrowLeft') goTo(idx - 1);
   });
+  // touch: swipe the stage sideways to change car (the page still scrolls vertically)
+  {
+    let sx = null, sy = 0; const stg = $('#cfStage');
+    stg.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; sx = e.clientX; sy = e.clientY; });
+    addEventListener('pointerup', e => { if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null; if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) goTo(idx + (dx < 0 ? 1 : -1)); });
+    addEventListener('pointercancel', () => { sx = null; });
+  }
   sizeItems(); setInfo(0);
   addEventListener('resize', () => { clearTimeout(window.__cfR); window.__cfR = setTimeout(sizeItems, 120); });
 
@@ -200,6 +207,13 @@
   }
   renderClub();
   document.addEventListener('diy:rewards', renderClub);
+  // phones: only three quests show; one button folds out the rest (and back)
+  {
+    const btn = $('#questsMore'), list = $('#quests'), mq = matchMedia('(max-width: 760px)');
+    const paint = () => { const open = list.classList.contains('open'); btn.hidden = !mq.matches; btn.setAttribute('aria-expanded', open); btn.firstChild.textContent = open ? 'Fold them away ' : `Show all ${quests.length} quests `; $('.arr', btn).textContent = open ? 'â†‘' : 'â†“'; };
+    btn.addEventListener('click', () => { list.classList.toggle('open'); paint(); if (window.ScrollTrigger) ScrollTrigger.refresh(); if (window.gsap && list.classList.contains('open')) gsap.from($$('#quests li:nth-child(n+4)'), { y: 16, opacity: 0, stagger: .03, duration: .4, ease: 'power2.out' }); });
+    mq.addEventListener('change', paint); paint();
+  }
 
   $('#hiddenStar').addEventListener('click', e => { e.preventDefault(); confetti(e.clientX, e.clientY, 40); pop('YOU FOUND ME!', e.clientX, e.clientY - 40, { size: '28px' }); reward('star', 1, 'Hidden star'); });
 

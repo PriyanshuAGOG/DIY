@@ -77,7 +77,7 @@
         return s;
       },
       mid(W, r) {
-        const gy = x => 600 + Math.sin(x / 300) * 22 + Math.sin(x / 97) * 6;
+        const gy = x => (W < 1000 ? 458 : 600) + Math.sin(x / 300) * 22 + Math.sin(x / 97) * 6; // phones/tablets in portrait: the horizon sits higher, so the road is deep enough for the whole car
         const pts = []; for (let x = -20; x <= W + 140; x += 120) pts.push([x, gy(x)]);
         let s = poly([[-20, H], ...pts, [W + 140, H]].map(([x, y]) => [x, y + 8]), 'rgba(0,0,0,.08)');
         s += poly([[-20, H], ...pts, [W + 140, H]], '#bfe9d3');
@@ -92,7 +92,8 @@
       },
       road(W) {
         // a deep road: the hero's words sit on its left, the car drives on its right, and the whole car (rear wheels too) is on tarmac
-        let s = `<rect x="0" y="606" width="${W}" height="40" fill="#9bd6bd"/><rect x="0" y="636" width="${W}" height="${H - 636}" fill="#2a2b28"/><rect x="0" y="636" width="${W}" height="6" fill="#f7f5ef"/>`;
+        const t = W < 1000 ? 500 : 636; // portrait screens get a deeper road
+        let s = `<rect x="0" y="${t - 30}" width="${W}" height="40" fill="#9bd6bd"/><rect x="0" y="${t}" width="${W}" height="${H - t}" fill="#2a2b28"/><rect x="0" y="${t}" width="${W}" height="6" fill="#f7f5ef"/>`;
         for (let x = Math.round(W * .5); x < W; x += 120) s += `<rect x="${x}" y="872" width="64" height="7" fill="#c5ef41"/>`;
         return s;
       },
@@ -104,7 +105,7 @@
             const col = ['#ff7d3f', '#c5ef41', '#9bd6bd', '#ff641f'][i % 4];
             s += poly([[bx - 16, H + 4], [bx + lean, top], [bx + 18, H + 4]], col) + poly([[bx + lean, top], [bx + 18, H + 4], [bx + 2, H + 4]], 'rgba(0,0,0,.12)');
           }
-          for (let i = 0; i < 3; i++) {
+          for (let i = 0; i < (W < 1000 ? 1 : 3); i++) { // portrait: one flower only, so the words stay clear
             const fx = x0 + (flip ? -1 : 1) * (40 + i * 70 + r() * 30), fy = 700 + r() * 80;
             s += `<rect x="${fx - 2}" y="${fy}" width="4" height="${H - fy}" fill="#20211e"/>`;
             const g = ngon(fx, fy, 22, 6, 0);
@@ -112,7 +113,7 @@
           }
         };
         // only the right edge gets grass: the bottom-left is kept clear for the hero's words
-        tuft(W + 10, 200, true);
+        tuft(W + 10, W < 1000 ? 60 : 200, true);
         for (let i = 0; i < 6; i++) s += star4(W * (.25 + r() * .5), 110 + r() * 200, 6 + r() * 8, i % 2 ? '#ff641f' : '#c5ef41', .9);
         return s;
       }
@@ -387,7 +388,7 @@
 
   // pointer parallax for a built scene (desktop only)
   function parallax(scene, area, amt = 60) {
-    if (!window.gsap || !matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.gsap || !matchMedia('(hover: hover) and (pointer: fine)').matches || document.documentElement.classList.contains('calm')) return;
     const movers = scene.layers.map(L => ({ x: gsap.quickTo(L.el, 'x', { duration: 1, ease: 'power3' }), y: gsap.quickTo(L.el, 'y', { duration: 1, ease: 'power3' }), d: L.depth, yd: L.yDepth ?? L.depth }));
     // one layout read when the pointer arrives, one update per frame at most (no layout thrash on fast mice)
     let r = null, ev = null, queued = false;

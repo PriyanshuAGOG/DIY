@@ -53,7 +53,7 @@ body[data-page="home"] { background: #fbf3e4; }
   .dream__title .w { display: block; }
   .dream__title .br { display: none; }
   .dream__sun { right: 6%; top: 7%; width: 26vw; }
-  .dream__car { width: 86vw; right: 7vw; bottom: 19%; }
+  .dream__car { width: min(88vw, 50vh); right: 6vw; bottom: clamp(16%, calc(215px + 3%), 31%); } /* sits just above the words block, whatever the screen height */
   .dream__hint { display: none; }
   .dream__ui p { max-width: 30ch; }
   .dream__ui .btn { min-height: 42px; padding: 0 16px; font-size: 14px; }
@@ -314,3 +314,32 @@ body[data-page="home"] { background: #fbf3e4; }
 .child--static .child__after { top: auto; bottom: 4vh; translate: none; color: var(--ink); background: var(--paper); padding: 18px 22px; border-radius: 18px; margin: 0 var(--gutter); width: auto; }
 .child--static .child__after .child__a, .child--static .child__after .child__a b { color: var(--ink); }
 .child--static .launch__smoke, .child--static .launch__count { display: none; }
+
+/* ---------- phones: the quest list is long, so it folds away behind one button (desktop is untouched) ---------- */
+.quests__more { display: none; }
+@media (max-width: 760px) {
+  .club__grid { gap: 22px; }
+  .club .jar { order: -1; }
+  .jar__glass { width: min(190px, 46vw, 28vh); }
+  .quests:not(.open) li:nth-child(n+4) { display: none; }
+  .quests:not(.open) li:nth-child(3) { position: relative; }
+  .quests__more { display: inline-flex; margin-top: 12px; color: var(--ink); }
+}
+@media (max-width: 760px) { .cf__stage { touch-action: pan-y; } }
+
+/* phones: the six games become a swipe row instead of a six-card-tall column */
+@media (max-width: 620px) {
+  .arcade__grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin: 0 calc(-1 * var(--gutter)); padding: 14px var(--gutter) 22px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .arcade__grid::-webkit-scrollbar { display: none; }
+  .arcade__grid .gcard { flex: 0 0 78%; scroll-snap-align: center; min-height: 250px; }
+  .arcade__grid::after { content: ""; flex: 0 0 1px; }
+}
+
+/* phones have no mouse to push the paper around, so the hero idles by itself: clouds drift, the sun's rays turn */
+@media (max-width: 760px), (max-aspect-ratio: 4/5) {
+  .dream__scene .scn__l--clouds { animation: cloudDrift 46s ease-in-out infinite alternate; }
+  .dream__scene .scn__l--far { animation: cloudDrift 70s ease-in-out infinite alternate-reverse; }
+  .dream__sun i { animation: sunTurn 40s linear infinite; }
+}
+@keyframes cloudDrift { from { translate: -4% 0; } to { translate: 4% 0; } }
+@keyframes sunTurn { to { rotate: 360deg; } }

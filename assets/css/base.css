@@ -371,9 +371,7 @@ html[data-tx="shutter"]::after { background: #3b3d38; }
 .split-line { display: block; overflow: hidden; padding-bottom: .04em; }
 .split-line > span { display: inline-block; will-change: transform; }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
-}
+html.calm *, html.calm *::before, html.calm *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 .shake { animation: shake .5s; }
 @keyframes shake { 20% { transform: translate(-6px, 3px) rotate(-.6deg); } 40% { transform: translate(6px, -3px) rotate(.6deg); } 60% { transform: translate(-4px, 2px); } 80% { transform: translate(4px, -2px); } }
 
@@ -447,3 +445,6 @@ main > section, main > div, main > nav { overflow-x: clip; }
   .shelf__row::-webkit-scrollbar { display: none; }
   .shelf__row .kit { flex: 0 0 80%; scroll-snap-align: start; }
 }
+.calm-btn { margin-top: 14px; display: block; color: #c9c8c0; border: 1px solid rgba(247,245,239,.2); border-radius: 99px; padding: 8px 14px; width: max-content; }
+.calm-btn b { color: var(--acid); font-weight: 400; }
+.calm-btn:hover { border-color: var(--acid); }
