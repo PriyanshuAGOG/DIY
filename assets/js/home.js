@@ -257,7 +257,7 @@
   // speed: the faster you scroll, the more the car bounces on its springs, noses up and trails speed lines
   const carImg = carBox.querySelector('.stg__img'), lines = $$('.dream__speed i', carBox);
   gsap.set(lines, { scaleX: 0, transformOrigin: '0 50%' });
-  gsap.timeline({ scrollTrigger: { trigger: '.dream__pin', start: 'top top', end: '+=150%', pin: true, scrub: .8, invalidateOnRefresh: true,
+  gsap.timeline({ scrollTrigger: { trigger: '.dream__pin', start: 'top top', end: '+=150%', pin: true, scrub: DIYscrub(.8), invalidateOnRefresh: true,
     onUpdate: s => {
       const v = Math.min(1, Math.abs(s.getVelocity()) / 1800), moving = s.progress > .01 && s.progress < .5 ? 1 : 0, k = v * moving;
       gsap.set(carImg, { y: Math.sin(performance.now() / 34) * 3.2 * k, rotation: -1.4 * k, transformOrigin: '50% 100%' });
@@ -289,7 +289,7 @@
     // the night only exists once the rocket leaves; the box only once it falls in. Until then it's all the sun's orange
     gsap.set(['#childSky', '.launch'], { autoAlpha: 0 });
     let launched = false, tIgn = .6, tLift = .65, tNight = .8;
-    const tl = gsap.timeline({ scrollTrigger: { trigger: '.child__pin', start: 'top top', end: '+=340%', pin: true, scrub: .8, invalidateOnRefresh: true,
+    const tl = gsap.timeline({ scrollTrigger: { trigger: '.child__pin', start: 'top top', end: '+=340%', pin: true, scrub: DIYscrub(.8), invalidateOnRefresh: true,
       onUpdate: s => {
         const p = s.progress;
         $('.child').classList.toggle('ignite', p > tIgn && p < tNight + .1);
@@ -348,7 +348,7 @@
   {
     const steps = $$('#howSteps li');
     const setStep = n => { steps.forEach((s, i) => s.classList.toggle('on', i === n)); $('#howCount').textContent = '0' + (n + 1); };
-    gsap.timeline({ scrollTrigger: { trigger: '.how__pin', start: 'top top', end: '+=' + Math.round(innerHeight * 2.6), pin: true, scrub: .8, onUpdate: s => setStep(Math.min(4, Math.floor(s.progress * 5))) } })
+    gsap.timeline({ scrollTrigger: { trigger: '.how__pin', start: 'top top', end: '+=' + Math.round(innerHeight * 2.6), pin: true, scrub: DIYscrub(.8), onUpdate: s => setStep(Math.min(4, Math.floor(s.progress * 5))) } })
       .fromTo('#sheet', { rotateX: 55, rotateZ: -8, y: 60 }, { rotateX: 0, rotateZ: -2, y: 0, duration: 1 })
       .to('#scissors', { opacity: 1, duration: .1 })
       .to('#scissors', { keyframes: [{ left: '60%', top: '12%' }, { left: '70%', top: '50%' }, { left: '15%', top: '55%' }, { left: '55%', top: '85%' }], duration: 1.2, ease: 'none' })
@@ -401,6 +401,6 @@
 
   addEventListener('load', () => {
     ScrollTrigger.refresh();
-    if (location.hash) { const t = $(location.hash); if (t) setTimeout(() => window.lenis ? lenis.scrollTo(t, { immediate: true }) : t.scrollIntoView(), 150); }
+    if (location.hash) { const t = $(location.hash); if (t) DIYcore.revealed.then(() => setTimeout(() => { window.lenis ? lenis.scrollTo(t, { immediate: true }) : t.scrollIntoView(); ScrollTrigger.refresh(); }, 120)); }
   });
 })();

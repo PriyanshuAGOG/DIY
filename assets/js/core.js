@@ -11,6 +11,19 @@
   // turn the whole site static. Now only the visitor's own "Calm motion" switch (footer) turns the animations off.
   const reduce = (() => { try { return localStorage.getItem('diy.calm') === 'true'; } catch (e) { return false; } })();
   if (reduce) document.documentElement.classList.add('calm');
+  const TOUCH = matchMedia('(pointer: coarse)').matches;
+  // on a touch screen the browser's own scrolling is already smooth: scrubbed animations follow the finger closely instead of lagging behind it
+  window.DIYscrub = v => v === true ? true : TOUCH ? Math.min(v, .25) : v;
+  // haptics (Android; iPhones ignore vibrate): a different feel for a tap, an add-to-bag, a pop and a win
+  const HAP = { tick: 7, tap: 12, pop: [16, 28, 22], win: [20, 40, 20, 40, 60], warn: [30, 60, 30] };
+  let lastHap = 0;
+  function haptic(kind = 'tap') {
+    if (reduce || !navigator.vibrate) return;
+    const n = performance.now(); if (n - lastHap < 45) return; lastHap = n;
+    try { navigator.vibrate(HAP[kind] || 10); } catch (e) {}
+  }
+  // every image fades in as it arrives (no pop-in, no flash of empty space)
+  document.addEventListener('load', e => { if (e.target.tagName === 'IMG') e.target.classList.add('is-loaded'); }, true);
   const byId = id => DIY.all.find(p => p.id === id);
   const imgOf = p => url(p.thumb);
   const priceOf = p => p.salePrice || p.price;
@@ -122,6 +135,7 @@
           <nav class="hdr__nav" aria-label="Primary">
             <a href="${url('store/')}index.html" ${PAGE === 'store' ? 'aria-current="page"' : ''}><span>Shop<sup>${DIY.all.length}</sup></span></a>
             <a class="live" href="${url('cars/automobiles/')}index.html" ${PAGE === 'cars' ? 'aria-current="page"' : ''}><span>Paper garage</span></a>
+            <a href="${url('play/')}index.html" ${PAGE === 'play' ? 'aria-current="page"' : ''}><span>Play</span></a>
             <a href="${url('race/')}index.html" ${PAGE === 'race' ? 'aria-current="page"' : ''}><span>Grand Prix</span></a>
             <a href="${url('')}index.html#arcade"><span>Our chaos</span></a>
           </nav>
@@ -138,6 +152,7 @@
         <div>
           <a class="big" href="${url('cars/automobiles/')}index.html">Paper garage</a>
           <a class="big" href="${url('store/')}index.html">Shop all 15</a>
+          <a class="big" href="${url('play/')}index.html">Play and win</a>
           <a class="big" href="${url('race/')}index.html">Grand Prix</a>
           <a class="big" href="${url('')}index.html#arcade">Our chaos</a>
         </div>
@@ -210,6 +225,7 @@
               <li><a href="${url("store/")}index.html#col-jdm">JDM legends</a></li>
               <li><a href="${url("store/")}index.html#col-flex">Hypercars</a></li></ul></div>
             <div><h4>PLAY</h4><ul>
+              <li><a href="${url('play/')}index.html">Paper Arcade leaderboard</a></li>
               <li><a href="${url('race/')}index.html">Paper Grand Prix</a></li>
               <li><a href="${url('race/')}index.html?mode=online">Race a friend online</a></li>
               <li><a href="${url('')}index.html#arcade">Procrastination station</a></li>
@@ -254,7 +270,7 @@
     const p = byId(id); if (!p) return;
     const line = state.cart.find(l => l.id === id);
     line ? line.qty += qty : state.cart.push({ id, qty });
-    save(); sync(); bump('#bagCount');
+    save(); sync(); bump('#bagCount'); haptic('pop');
     if (el) flyTo(el, '#bagCount', url(p.thumb));
     if (!quiet) toast(`${p.name} is parked in your bag.`, '🏁', 'View bag', () => open('bag'));
   }
@@ -266,7 +282,7 @@
   function wish(id) {
     const on = !state.wish.includes(id);
     state.wish = on ? [...state.wish, id] : state.wish.filter(x => x !== id);
-    save(); sync(); bump('#wishCount');
+    save(); sync(); bump('#wishCount'); haptic('tap');
     $$(`[data-wish="${id}"]`).forEach(b => { b.setAttribute('aria-pressed', on); if (on && window.gsap) gsap.fromTo(b, { scale: .6, rotate: -30 }, { scale: 1, rotate: 0, ease: 'elastic.out(1,.4)', duration: .8 }); });
     if (on) toast('Saved to your dream garage.', '♥');
     if ($('#drawer').classList.contains('on')) renderDrawer();
@@ -373,22 +389,39 @@
 
   /* ---------- confetti + party poppers ---------- */
   const COLORS = ['#ff641f', '#c5ef41', '#b9ecd7', '#c6c3ff', '#f7f5ef', '#f6c3d4', '#20211e'];
+  // confetti is one canvas and one animation loop, however many pieces: hundreds of DOM nodes (the old way) is what made phones stutter
+  let cvs = null, cx2 = null, parts = [], cfRaf = 0, cfLast = 0;
+  function cfLoop(t) {
+    const dt = Math.min(.04, (t - cfLast) / 1000 || .016); cfLast = t;
+    cx2.clearRect(0, 0, cvs.width, cvs.height);
+    const k = cvs.width / innerWidth;
+    parts = parts.filter(p => (p.life += dt) < p.ttl);
+    for (const p of parts) {
+      const drag = Math.pow(.06, dt); p.vx *= drag; p.vy = p.vy * drag + 900 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+      const a = p.life > p.ttl - .5 ? (p.ttl - p.life) / .5 : 1, flip = Math.cos(p.life * p.fs); // the flutter: pieces turn over as they fall
+      cx2.globalAlpha = a; cx2.fillStyle = p.c; cx2.setTransform(k, 0, 0, k, 0, 0); cx2.translate(p.x, p.y); cx2.rotate(p.r); cx2.scale(1, flip);
+      p.strip ? cx2.fillRect(-3, -11, 6, 22) : (cx2.beginPath(), cx2.moveTo(0, -8), cx2.lineTo(6, -3), cx2.lineTo(3, 8), cx2.lineTo(-6, 4), cx2.closePath(), cx2.fill());
+    }
+    cx2.setTransform(1, 0, 0, 1, 0, 0);
+    if (parts.length) cfRaf = requestAnimationFrame(cfLoop); else { cfRaf = 0; cvs.remove(); cvs = null; }
+  }
   function confetti(x = innerWidth / 2, y = innerHeight / 2, n = 36, o = {}) {
     if (!o.quiet) snd.fx('squeak', { vol: .7, rate: .9 + Math.random() * .4 }); // every little burst of confetti squeaks
-    if (reduce || !window.gsap) return;
-    const ang = o.angle ?? null, spread = o.spread ?? 360, power = o.power ?? 1;
-    for (let i = 0; i < n; i++) {
-      const s = document.createElement('i');
-      s.className = 'shard' + (i % 3 === 0 ? ' strip' : '');
-      s.style.background = COLORS[i % COLORS.length];
-      document.body.append(s);
-      const a = (ang === null ? Math.random() * 360 : ang + (Math.random() - .5) * spread) * Math.PI / 180;
-      const v = (140 + Math.random() * 320) * power;
-      gsap.set(s, { x, y });
-      gsap.timeline({ onComplete: () => s.remove() })
-        .to(s, { x: x + Math.cos(a) * v, y: y + Math.sin(a) * v, rotation: gsap.utils.random(-540, 540), rotationX: gsap.utils.random(0, 360), duration: .9, ease: 'power3.out' })
-        .to(s, { y: '+=' + (innerHeight * gsap.utils.random(.5, .9)), x: '+=' + gsap.utils.random(-80, 80), rotation: '+=' + gsap.utils.random(-360, 360), opacity: 0, duration: gsap.utils.random(1.4, 2.4), ease: 'power1.in' }, '-=.25');
+    if (reduce) return;
+    haptic(o.quiet ? 'tick' : 'pop');
+    const count = Math.round(n * (TOUCH ? .5 : 1)), ang = o.angle ?? null, spread = o.spread ?? 360, power = o.power ?? 1;
+    if (!cvs) {
+      cvs = document.createElement('canvas'); cvs.setAttribute('aria-hidden', 'true');
+      const d = Math.min(devicePixelRatio || 1, TOUCH ? 1.5 : 2); cvs.width = Math.round(innerWidth * d); cvs.height = Math.round(innerHeight * d);
+      Object.assign(cvs.style, { position: 'fixed', inset: 0, width: '100%', height: '100%', zIndex: 250, pointerEvents: 'none' });
+      document.body.append(cvs); cx2 = cvs.getContext('2d');
     }
+    for (let i = 0; i < count; i++) {
+      const a = (ang === null ? Math.random() * 360 : ang + (Math.random() - .5) * spread) * Math.PI / 180, v = (260 + Math.random() * 760) * power;
+      parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6.28, vr: (Math.random() - .5) * 18, c: COLORS[i % COLORS.length], strip: i % 3 === 0, life: 0, ttl: 1.8 + Math.random() * 1.6, fs: 6 + Math.random() * 8 });
+    }
+    if (parts.length > 700) parts.splice(0, parts.length - 700);
+    if (!cfRaf) { cfLast = performance.now(); cfRaf = requestAnimationFrame(cfLoop); }
   }
   function poppers() {
     const h = innerHeight, w = innerWidth;
@@ -634,7 +667,9 @@
   // the sheet lands over the page, then we go
   function leave(href) {
     if (reduce || !window.gsap) { location.href = href; return; }
-    if (leaving) return; leaving = true; // a double click never stacks two sheets
+    if (leaving) return; // a double click never stacks two sheets
+    if (tx().classList.contains('on')) { location.href = href; return; } // a sheet is still opening: just go, never start a second one on top
+    leaving = true;
     const type = isGarage(new URL(href, location.href).pathname) || PAGE === 'cars' ? 'shutter' : (() => {
       let n = 0; try { n = +sessionStorage.getItem('diy.txn') || 0; sessionStorage.setItem('diy.txn', n + 1); } catch (e) {}
       return TYPES[n % TYPES.length];
@@ -717,7 +752,7 @@
 
   /* ---------- motion: smooth scroll, header, cursor, magnetic, page transitions ---------- */
   function motion() {
-    if (!reduce && window.Lenis) {
+    if (!reduce && window.Lenis && !TOUCH) { // phones keep native scrolling: smoother, and the address bar behaves
       window.lenis = new Lenis({ duration: 1.1, smoothWheel: true });
       if (window.gsap) { lenis.on('scroll', () => window.ScrollTrigger && ScrollTrigger.update()); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
       else { const raf = t => { lenis.raf(t); requestAnimationFrame(raf); }; requestAnimationFrame(raf); }
@@ -800,6 +835,7 @@
       word.addEventListener('pointerdown', () => { holdIv = setInterval(() => feed(.03), 40); });
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => word.addEventListener(ev, () => clearInterval(holdIv)));
       function tear() {
+        haptic('win');
         torn = true; clearInterval(holdIv);
         snd.swish(.22, .35, 2200, 650); // a paper rip without a voice recording
         tz.classList.add('torn');
@@ -997,6 +1033,8 @@
 
   /* ---------- events ---------- */
   function events() {
+    // a light tick under the finger for anything tappable (touch screens only)
+    if (TOUCH) document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' && e.target.closest && e.target.closest('button, .btn, a[href], [role="button"], .seg, .rnd, .gcard')) haptic('tick'); }, { passive: true });
     document.addEventListener('click', e => {
       const t = e.target.closest('[data-add],[data-buy],[data-set],[data-wish],[data-open],[data-close],[data-tab],[data-qty],[data-checkout],[data-confetti],[data-rev],[data-sound],#burger,#scrim');
       if (!t) return;
@@ -1055,5 +1093,5 @@
   motion();
   eggs();
 
-  window.DIYcore = { ROOT, url, inr, card, shelves, stage, sfx, playSfx, hideSfx, pop, burst: pop, honk, add, wish, reward, rewardTotal, toast, confetti, poppers, rev, snd, go, lead, arrived, revealed, _tx: txDebug, open, closeAll, lockScroll, totals, state, store, byId, imgOf, priceOf, hrefOf, reduce, $, $$ };
+  window.DIYcore = { haptic, TOUCH, ROOT, url, inr, card, shelves, stage, sfx, playSfx, hideSfx, pop, burst: pop, honk, add, wish, reward, rewardTotal, toast, confetti, poppers, rev, snd, go, lead, arrived, revealed, _tx: txDebug, open, closeAll, lockScroll, totals, state, store, byId, imgOf, priceOf, hrefOf, reduce, $, $$ };
 })();

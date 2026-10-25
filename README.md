@@ -58,3 +58,18 @@ The footer tear celebration uses synthesized paper noise, pops and confetti fizz
 ## Credits
 
 Designed and printed by Do It Yar.
+
+## Paper Arcade (games, leaderboard, prizes)
+
+`/play/` has three score games (Stack the Sheets, Paper Plane Dash, Fold Sequence), a season leaderboard and the prize
+campaign (top three on the all-round board win discount codes). Season name, end date and prizes live in `lib/play.js`
+(and the same defaults in `assets/js/play.js`). Games are not tied to cars, so new paper collections can have their own.
+
+The leaderboard needs a small database. Until it is connected the page works on the visitor's device only and says so.
+
+1. Vercel project → **Storage** → create/connect **Upstash Redis** (free). `KV_REST_API_URL` and `KV_REST_API_TOKEN` are added automatically.
+2. Vercel project → **Settings → Environment Variables** → add `ADMIN_KEY` (any long secret you choose).
+3. Redeploy. The leaderboard goes live.
+4. When the season ends, get the winners with their contact details (only players who ticked the consent box):
+   `curl -H "x-admin-key: YOUR_KEY" https://YOUR-SITE/api/winners`
+   Check them, then email each winner their code. Scores are range- and speed-checked on the server, but always confirm winners yourself.

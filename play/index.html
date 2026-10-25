@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>try{var t=JSON.parse(sessionStorage.getItem("diy.tx")||"null");if(t&&Date.now()-t.t<15000&&localStorage.getItem("diy.calm")!=="true"){document.documentElement.setAttribute("data-tx",t.type);setTimeout(function(){document.documentElement.removeAttribute("data-tx")},5000)}}catch(e){}</script>
+  <title>Paper Arcade · Play, climb, win | Do It Yar</title>
+  <meta name="description" content="Three quick paper games, one season leaderboard. The top three players win real discounts on their next Do It Yar order.">
+  <meta name="theme-color" content="#121311">
+  <link rel="icon" href="../assets/img/logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css?v=15">
+  <link rel="stylesheet" href="../assets/css/play.css?v=15">
+</head>
+<body class="grain gp" data-root="../" data-page="play" data-theme="dark">
+<main id="main">
+
+  <!-- ============ HERO + THE CAMPAIGN ============ -->
+  <section class="pl-hero">
+    <div class="wrap pl-hero__in">
+      <div class="pl-hero__copy">
+        <span class="mono">Do It Yar Paper Arcade / season leaderboard</span>
+        <h1 class="display">Play.<br>Climb.<br><em>Win.</em></h1>
+        <p>Three quick paper games. Every score counts toward one all-round leaderboard. When the season ends, the top three players win real discounts on their next order.</p>
+        <div class="pl-hero__cta"><a class="btn btn--acid" href="#games">Pick a game <span class="arr">↓</span></a><a class="btn btn--ghost" href="#board">See the leaderboard</a></div>
+      </div>
+      <aside class="pl-cup" aria-label="Season prizes">
+        <span class="mono" id="seasonName">Season 01 · The Paper Cup</span>
+        <div class="pl-clock" id="seasonClock" aria-live="off"><b data-u="d">00</b><small>days</small><b data-u="h">00</b><small>hrs</small><b data-u="m">00</b><small>min</small><b data-u="s">00</b><small>sec</small></div>
+        <ol class="pl-prizes" id="prizes"></ol>
+        <p class="pl-cup__fine">Prizes are discount codes for your next Do It Yar order, sent to the winners by email or WhatsApp when the season ends.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- a friend's challenge, when you arrive from a shared link -->
+  <div class="wrap"><div class="pl-challenge" id="challenge" hidden></div></div>
+
+  <!-- ============ THE GAMES ============ -->
+  <section class="pl-sec" id="games">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">Choose your game</span><h2>Three ways<br>to climb.</h2></div><p>Each takes about a minute. Your best score in every game is added up for the all-round board, so playing all three beats being great at one.</p></div>
+      <div class="pl-games" id="gameGrid"></div>
+      <a class="pl-multi" href="../race/index.html" data-cursor="Race">
+        <div><span class="mono">Live multiplayer</span><b class="display">Paper Grand Prix</b><p>Race a friend head to head, online or on one screen. Pick any kit, shift in the green, first past the flag wins.</p></div>
+        <span class="btn btn--paper">Start racing <span class="arr">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ YOUR PLAYER CARD ============ -->
+  <section class="pl-sec pl-sec--tint" id="player">
+    <div class="wrap pl-player">
+      <div class="pl-player__copy">
+        <span class="mono">Your player card</span>
+        <h2 class="display">Who’s<br>playing?</h2>
+        <p>Your handle is what appears on the leaderboard. To be reachable if you win, add an email or phone. Both are optional and only ever used to send you your prize.</p>
+      </div>
+      <form class="pl-form" id="playerForm" novalidate>
+        <label><span>Leaderboard handle</span><input name="name" maxlength="18" autocomplete="nickname" placeholder="PaperRacer" required></label>
+        <div class="pl-form__row">
+          <label><span>Email <i>(for prizes)</i></span><input name="email" type="email" maxlength="80" autocomplete="email" placeholder="you@curious.com"></label>
+          <label><span>Phone <i>(for prizes)</i></span><input name="phone" type="tel" inputmode="tel" maxlength="16" autocomplete="tel" placeholder="98765 43210"></label>
+        </div>
+        <label class="pl-check"><input type="checkbox" name="consent"> <span>Yes, you may contact me about my prize. My email/phone is stored only for this campaign and never shown publicly.</span></label>
+        <div class="pl-form__foot"><button class="btn btn--orange" type="submit">Save my card</button><span class="pl-form__msg" id="playerMsg" role="status"></span></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ THE LEADERBOARD ============ -->
+  <section class="pl-sec" id="board">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">Season leaderboard</span><h2>Who’s on<br>top?</h2></div>
+        <div class="pl-tabs" id="boardTabs" role="tablist" aria-label="Leaderboard"></div></div>
+      <div class="pl-board" id="boardBox"><ol class="pl-rows" id="rows" aria-live="polite"></ol><p class="pl-board__note" id="boardNote"></p></div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="pl-sec pl-sec--tint">
+    <div class="wrap">
+      <div class="shead"><div><span class="mono">Fair play</span><h2>The small<br>print.</h2></div></div>
+      <div class="pl-rules">
+        <article><b class="display">01</b><h3>Points, not luck</h3><p>Every game turns your score into up to 1,000 points. Your best score per game counts, so the all-round board can reach 3,000.</p></article>
+        <article><b class="display">02</b><h3>Top three win</h3><p>When the season ends, the top three on the all-round board each get a discount code. We contact winners using the details on their player card.</p></article>
+        <article><b class="display">03</b><h3>Scores are checked</h3><p>Scores that couldn’t be played by a human are rejected, and we confirm every winner before any code is sent. Play fair and it never matters.</p></article>
+        <article><b class="display">04</b><h3>Your data</h3><p>The leaderboard only shows your handle and score. Email and phone stay private and are used for prizes only.</p></article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer"></div>
+
+<!-- the arena: a game fills this, whatever it is -->
+<div class="arena" id="arena" role="dialog" aria-modal="true" aria-labelledby="arenaTitle" aria-hidden="true">
+  <div class="arena__card">
+    <header class="arena__bar">
+      <div><span class="mono" id="arenaKick">Game</span><b class="display" id="arenaTitle">Game</b></div>
+      <div class="arena__score"><span class="mono">Score</span><b class="display" id="arenaScore">0</b></div>
+      <button class="x" id="arenaClose" aria-label="Close game">✕</button>
+    </header>
+    <div class="arena__stage" id="arenaStage"></div>
+    <p class="arena__hint mono" id="arenaHint"></p>
+    <div class="arena__over" id="arenaOver" hidden>
+      <span class="mono" id="overKick">Game over</span>
+      <b class="display" id="overScore">0</b>
+      <p id="overLine"></p>
+      <form class="arena__name" id="overName" hidden><input name="name" maxlength="18" placeholder="Pick a leaderboard handle" autocomplete="nickname" required><button class="btn btn--acid btn--sm" type="submit">Post my score</button></form>
+      <div class="arena__btns"><button class="btn btn--orange" id="overAgain">Play again</button><button class="btn btn--ghost" id="overShare">Challenge a friend</button><a class="btn btn--ghost" href="#board" id="overBoard">Leaderboard</a></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../assets/js/data.js?v=15"></script>
+<script src="../assets/js/core.js?v=15"></script>
+<script src="../assets/js/play.js?v=15"></script>
+</body>
+</html>

@@ -80,7 +80,7 @@
     const r = $('#show').getBoundingClientRect(); if (r.bottom < innerHeight * .4) return;
     if (e.key === 'ArrowRight') go(cur + 1); if (e.key === 'ArrowLeft') go(cur - 1);
   });
-  go(0);
+  DIYcore.revealed.then(() => go(0)); // the first slide starts once the page-transition sheet has opened, never underneath it
 
   // the header goes dark over the showroom
   const hdr = $('#hdr');

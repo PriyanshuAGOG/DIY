@@ -225,12 +225,15 @@
 
   /* ---------- motion ---------- */
   // landing on a car's page: it starts up. If the browser still wants a click first, it plays on that first tap (within 10 s)
-  snd.load('car-' + c.id); setTimeout(() => snd.car(c, { wait: 10000, dur: 5, fout: 1 }), DIYcore.arrived ? 700 : 350);
+  snd.load('car-' + c.id); DIYcore.revealed.then(() => setTimeout(() => snd.car(c, { wait: 10000, dur: 5, fout: 1 }), 350));
 
   if (!hasG) return;
-  gsap.from('.pp-gal', { y: 40, opacity: 0, duration: 1, ease: 'power3.out' });
-  gsap.from('.pp-buy > *', { y: 30, opacity: 0, stagger: .05, duration: .8, ease: 'power3.out', delay: .1 });
-  playSfx($('#ppSfx .sfx'), { delay: .5 });
+  // the intro plays once the page-transition sheet has opened, never underneath it
+  DIYcore.revealed.then(() => {
+    gsap.from('.pp-gal', { y: 40, opacity: 0, duration: 1, ease: 'power3.out' });
+    gsap.from('.pp-buy > *', { y: 30, opacity: 0, stagger: .05, duration: .8, ease: 'power3.out', delay: .1 });
+    playSfx($('#ppSfx .sfx'), { delay: .5 });
+  });
   $$('.pp-sec .shead h2').forEach(h => gsap.from(h, { y: 50, opacity: 0, duration: 1, ease: 'power4.out', scrollTrigger: { trigger: h, start: 'top 88%' } }));
   // reveals never leave content hidden: they only play once the block is actually reached, and a late
   // layout shift (gallery images arriving) can never strand anything at opacity 0

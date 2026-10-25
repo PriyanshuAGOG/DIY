@@ -159,12 +159,12 @@
       const tween = gsap.to(track, {
         x: () => -travel(), ease: 'none',
         scrollTrigger: {
-          trigger: pin, start: 'top top', end: () => '+=' + travel(), pin: true, scrub: .6, invalidateOnRefresh: true,
+          trigger: pin, start: 'top top', end: () => '+=' + travel(), pin: true, scrub: DIYscrub(.6), invalidateOnRefresh: true,
           onUpdate: s => { bar.style.width = s.progress * 100 + '%'; count.textContent = pad(Math.min(5, Math.round(s.progress * 5))); }
         }
       });
       hallST[hall.id] = tween.scrollTrigger;
-      scn.layers.forEach(L => gsap.to(L.el, { x: () => -L.depth * travel(), ease: 'none', scrollTrigger: { trigger: pin, start: 'top top', end: () => '+=' + travel(), scrub: .6, invalidateOnRefresh: true } }));
+      scn.layers.forEach(L => gsap.to(L.el, { x: () => -L.depth * travel(), ease: 'none', scrollTrigger: { trigger: pin, start: 'top top', end: () => '+=' + travel(), scrub: DIYscrub(.6), invalidateOnRefresh: true } }));
 
       $$('.bay', hall).forEach(b => {
         const i = cars.findIndex(c => c.id === b.dataset.id), car = cars[i];

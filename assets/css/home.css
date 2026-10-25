@@ -350,3 +350,10 @@ body[data-page="home"] { background: #fbf3e4; }
 .dream__speed { position: absolute; left: 94%; bottom: 8%; width: 34%; height: 56%; pointer-events: none; z-index: 0; }
 .dream__speed i { position: absolute; left: 0; height: 3px; border-radius: 3px; background: rgba(247,245,239,.7); opacity: 0; width: 100%; }
 .dream__speed i:nth-child(1) { top: 12%; width: 70%; } .dream__speed i:nth-child(2) { top: 30%; width: 100%; } .dream__speed i:nth-child(3) { top: 48%; width: 82%; } .dream__speed i:nth-child(4) { top: 66%; width: 100%; } .dream__speed i:nth-child(5) { top: 84%; width: 60%; }
+
+/* the season ribbon above the arcade grid */
+.pl-ribbon { display: grid; grid-template-columns: auto auto 1fr; gap: 6px 22px; align-items: center; margin-bottom: clamp(12px, 1.6vw, 22px); padding: clamp(14px, 1.8vw, 22px) clamp(18px, 2.2vw, 30px); border-radius: 22px; background: var(--acid); color: var(--ink); border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--orange); transition: translate .3s var(--ease), box-shadow .3s var(--ease); }
+.pl-ribbon:hover { translate: -3px -3px; box-shadow: 10px 10px 0 var(--orange); }
+.pl-ribbon b { font-size: clamp(22px, calc(var(--u) * 2.6), 42px); line-height: 1; }
+.pl-ribbon span:last-child { font-weight: 700; }
+@media (max-width: 760px) { .pl-ribbon { grid-template-columns: 1fr; } }

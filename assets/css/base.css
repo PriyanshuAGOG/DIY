@@ -448,3 +448,28 @@ main > section, main > div, main > nav { overflow-x: clip; }
 .calm-btn { margin-top: 14px; display: block; color: #c9c8c0; border: 1px solid rgba(247,245,239,.2); border-radius: 99px; padding: 8px 14px; width: max-content; }
 .calm-btn b { color: var(--acid); font-weight: 400; }
 .calm-btn:hover { border-color: var(--acid); }
+
+/* ---------- touch / phone performance: no per-frame blur, no animated grain, fewer GPU layers ---------- */
+@media (max-width: 900px), (pointer: coarse) {
+  .grain::after { display: none; }
+  .hdr, .topbar { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .hdr { background: color-mix(in srgb, var(--paper) 97%, transparent); }
+  .hdr--dark { background: color-mix(in srgb, var(--night) 94%, transparent); }
+  .scrim, .bar, .lead, .picker, .res, .gm, .dir { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .scrim { background: rgba(20,20,18,.72); }
+  .sfx .c, .split-line > span, .tz__half { will-change: auto; }
+  .tx__h { filter: none; }
+  .tx[data-type="shutter"] .tx__h { filter: none; }
+  .kit { transition: none; } .kit:hover { translate: none; }
+  .pop .sfx__e { display: none; } /* the echo outlines triple the text layers for little visible gain on a small screen */
+}
+/* every tappable thing answers instantly: a quick press-in, no waiting for the action to finish */
+@media (pointer: coarse) {
+  button, .btn, a.kit__link, .seg, .rnd, .gcard { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .btn:active, .rnd:active, .kit__btns button:active, .kit__heart:active, .gcard:active { transform: scale(.95); transition: transform .08s; }
+  .btn:hover { translate: none; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+}
+/* images never leave a hole while they load: they fade in as soon as they arrive (and always show after 4s, whatever happens) */
+.stg__img:not(.is-loaded) { opacity: 0; animation: imgShow 0s 4s forwards; }
+.stg__img.is-loaded { opacity: 1; transition: opacity .4s; }
+@keyframes imgShow { to { opacity: 1; } }
