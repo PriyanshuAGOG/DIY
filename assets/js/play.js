@@ -9,22 +9,9 @@
     id: 's1', name: 'Season 01 · The Paper Cup', ends: '2026-12-01T23:59:59+05:30',
     prizes: [{ rank: 1, title: 'Flat 25% off', note: 'on your whole order' }, { rank: 2, title: 'Flat ₹200 off', note: 'on your order' }, { rank: 3, title: 'Flat ₹100 off', note: 'on your order' }]
   };
-  // points per game (kept in step with lib/play.js): score x k, capped at 1000
-  const PTS = { stack: 25, plane: 20, fold: 40 };
-  const pts = (g, s) => Math.min(1000, Math.round(s * PTS[g]));
-
-  /* ---------- the player (a random id + secret token live on this device; the name is the public handle) ---------- */
+  // the player, best scores and score posting are shared with the Grand Prix (arcade.js)
+  const { P, pts, cleanName, savePlayer, BEST, saveBest, submit, api } = DIYarcade;
   const rid = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
-  let P = store.get('player', null);
-  if (!P || !P.pid) { P = { pid: 'p' + rid(10), token: rid(16), name: '', email: '', phone: '', consent: false }; store.set('player', P); }
-  const savePlayer = () => store.set('player', P);
-  const BEST = store.get('playbest', {});
-  const cleanName = s => String(s || '').replace(/[^\p{L}\p{N} _.\-]/gu, '').trim().slice(0, 18);
-
-  const api = async (path, opts) => {
-    const r = await fetch(new URL(url('api/' + path), location.href), opts);
-    return { status: r.status, body: await r.json().catch(() => ({})) };
-  };
 
   /* ---------- tiny helpers: seeded randomness (so a challenge is the same course for both players) ---------- */
   const hashSeed = s => { let h = 1779033703; for (const c of String(s)) { h = Math.imul(h ^ c.charCodeAt(0), 3432918353); h = h << 13 | h >>> 19; } return h >>> 0; };
@@ -145,12 +132,14 @@
   const ART = {
     stack: '<svg viewBox="0 0 200 140" aria-hidden="true"><g stroke="#20211e" stroke-width="3" stroke-linejoin="round"><rect x="30" y="102" width="140" height="26" fill="#fffdf8"/><rect x="42" y="76" width="116" height="26" fill="#c6c3ff"/><rect x="56" y="50" width="92" height="26" fill="#b9ecd7"/><rect x="74" y="24" width="64" height="26" fill="#ff641f"/></g><path d="M150 12 l4 10 10 1 -8 7 3 10 -9 -6 -9 6 3 -10 -8 -7 10 -1Z" fill="#20211e"/></svg>',
     plane: '<svg viewBox="0 0 200 140" aria-hidden="true"><g stroke="#20211e" stroke-width="3" stroke-linejoin="round"><rect x="20" y="70" width="34" height="70" fill="#ff641f"/><rect x="14" y="62" width="46" height="14" fill="#c5ef41"/><rect x="146" y="0" width="34" height="56" fill="#ff641f"/><rect x="140" y="48" width="46" height="14" fill="#c5ef41"/><path d="M62 40 L134 62 L62 84 L82 62Z" fill="#fffdf8"/><path d="M82 62 L134 62 L62 84Z" fill="#e7dbc6"/></g></svg>',
+    race: '<svg viewBox="0 0 200 140" aria-hidden="true"><rect x="34" y="12" width="6" height="120" fill="#20211e"/><path d="M40 18 H162 V86 H40Z" fill="#fffdf8"/><g fill="#20211e"><rect x="40" y="18" width="20" height="17"/><rect x="81" y="18" width="20" height="17"/><rect x="121" y="18" width="20" height="17"/><rect x="60" y="35" width="21" height="17"/><rect x="101" y="35" width="20" height="17"/><rect x="141" y="35" width="21" height="17"/><rect x="40" y="52" width="20" height="17"/><rect x="81" y="52" width="20" height="17"/><rect x="121" y="52" width="20" height="17"/><rect x="60" y="69" width="21" height="17"/><rect x="101" y="69" width="20" height="17"/><rect x="141" y="69" width="21" height="17"/></g><path d="M40 18 H162 V86 H40Z" fill="none" stroke="#20211e" stroke-width="3"/></svg>',
     fold: '<svg viewBox="0 0 200 140" aria-hidden="true"><g stroke="#20211e" stroke-width="3" stroke-linejoin="round"><rect x="34" y="12" width="64" height="56" rx="10" fill="#ff641f"/><rect x="104" y="12" width="64" height="56" rx="10" fill="#c5ef41"/><rect x="34" y="74" width="64" height="56" rx="10" fill="#c6c3ff"/><rect x="104" y="74" width="64" height="56" rx="10" fill="#b9ecd7"/></g><path d="M34 12 H98 L34 68Z" fill="rgba(255,255,255,.4)"/></svg>'
   };
   const GAMES = [
     { id: 'stack', no: '01', name: 'Stack the Sheets', unit: 'layers', color: 'var(--acid)', blurb: 'Drop each sheet on the last. Whatever hangs over is cut off, and a perfect landing keeps your width. How high can you go?', hint: 'Tap anywhere (or press Space) to drop the sheet', mount: stackGame },
     { id: 'plane', no: '02', name: 'Paper Plane Dash', unit: 'pillars', color: 'var(--purple)', blurb: 'Tap to flap and glide through the gaps between rolled-paper pillars. It speeds up, and so does your heartbeat.', hint: 'Tap anywhere (or press Space) to flap', mount: planeGame },
-    { id: 'fold', no: '03', name: 'Fold Sequence', unit: 'rounds', color: 'var(--mint)', blurb: 'Watch the paper tiles light up, then repeat the pattern. One longer every round. Trust your ears as much as your eyes.', hint: 'Watch first, then tap the tiles in the same order', mount: foldGame }
+    { id: 'fold', no: '03', name: 'Fold Sequence', unit: 'rounds', color: 'var(--mint)', blurb: 'Watch the paper tiles light up, then repeat the pattern. One longer every round. Trust your ears as much as your eyes.', hint: 'Watch first, then tap the tiles in the same order', mount: foldGame },
+    { id: 'race', no: '04', name: 'Paper Grand Prix', unit: 'speed pts', color: 'var(--orange)', href: 'race/index.html', blurb: 'Launch on green, shift in the green, beat the studio bot. The faster your finish, the more points you bank. Every paper car drives the same.' }
   ];
   const G = id => GAMES.find(x => x.id === id);
 
@@ -166,12 +155,13 @@
 
   /* ---------- game cards ---------- */
   function renderGames() {
-    $('#gameGrid').innerHTML = GAMES.map(g => `
-      <button class="pg" data-g="${g.id}" style="--c:${g.color}" data-cursor="Play">
+    $('#gameGrid').innerHTML = GAMES.map(g => {
+      const inner = `
         <div class="pg__art">${ART[g.id]}</div>
         <div class="pg__txt"><span class="mono">Game ${g.no}</span><h3>${g.name}</h3><p>${g.blurb}</p></div>
-        <div class="pg__foot"><div class="pg__best"><span class="mono">Your best</span><b data-best="${g.id}">${BEST[g.id] || '—'}</b></div><span class="pg__go">Play <span class="arr">→</span></span></div>
-      </button>`).join('');
+        <div class="pg__foot"><div class="pg__best"><span class="mono">Your best</span><b data-best="${g.id}">${BEST[g.id] || '—'}</b></div><span class="pg__go">${g.href ? 'Race' : 'Play'} <span class="arr">→</span></span></div>`;
+      return g.href ? `<a class="pg" href="${url(g.href)}" style="--c:${g.color}" data-cursor="Race">${inner}</a>` : `<button class="pg" data-g="${g.id}" style="--c:${g.color}" data-cursor="Play">${inner}</button>`;
+    }).join('');
   }
   const paintBest = () => GAMES.forEach(g => { const el = $(`[data-best="${g.id}"]`); if (el) el.textContent = BEST[g.id] || '—'; });
 
@@ -216,7 +206,7 @@
     $('#overKick').textContent = g.name; $('#overScore').textContent = score;
     const line = $('#overLine'); over.hidden = false; $('#overName').hidden = true;
     if (score < 1) { line.textContent = 'No score this time. Give it another go.'; return; }
-    if (first) { BEST[g.id] = score; store.set('playbest', BEST); paintBest(); haptic('win'); confetti(innerWidth / 2, innerHeight * .35, 50, { quiet: 1 }); }
+    if (first) { saveBest(g.id, score); paintBest(); haptic('win'); confetti(innerWidth / 2, innerHeight * .35, 50, { quiet: 1 }); }
     const beat = cur.beat ? (score > cur.beat ? `You beat ${cur.by || 'your friend'}'s ${cur.beat}! ` : score === cur.beat ? `A tie with ${cur.by || 'your friend'}. ` : `${cur.by || 'Your friend'} had ${cur.beat}. `) : '';
     const post = async () => {
       line.textContent = beat + 'Posting your score…';
@@ -229,24 +219,6 @@
       f.onsubmit = e => { e.preventDefault(); const n = cleanName(f.name.value); if (n.length < 2) { f.name.focus(); return; } P.name = n; savePlayer(); fillPlayerForm(); f.hidden = true; post(); };
       setTimeout(() => f.name.focus({ preventScroll: true }), 80);
     } else post();
-  }
-
-  async function submit(game, score, ms) {
-    const body = { pid: P.pid, token: P.token, game, score, ms, name: P.name };
-    if (P.consent) { body.consent = true; body.email = P.email; body.phone = P.phone; }
-    try {
-      const { status, body: r } = await api('score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (r.ok) {
-        if (r.allRank && r.allRank <= 3) { haptic('win'); confetti(innerWidth / 2, innerHeight * .3, 80); }
-        return `${r.improved ? 'New best on the board. ' : 'Your best is still ' + r.best + '. '}#${r.rank} of ${r.of} in this game · #${r.allRank} all-round with ${r.total} pts${r.allRank <= 3 ? ' (prize zone!)' : ''}.`;
-      }
-      if (r.reason === 'not-configured') return `Saved on this device. The global leaderboard switches on very soon, and your best score will count.`;
-      if (r.reason === 'slow-down') return 'That was quick. Wait a few seconds between posted scores.';
-      if (r.reason === 'implausible') return 'That score looked too fast to be human, so it wasn’t posted.';
-      if (r.reason === 'season-over') return 'The season has ended. Thanks for playing!';
-      if (r.reason === 'not-you') return 'This handle belongs to another device. Pick a different handle on your player card.';
-      return 'Couldn’t reach the leaderboard. Your score is saved on this device.';
-    } catch (e) { return 'You seem to be offline. Your score is saved on this device.'; }
   }
 
   $('#gameGrid').addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (b) openGame(b.dataset.g); });

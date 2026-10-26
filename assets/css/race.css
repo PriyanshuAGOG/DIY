@@ -125,3 +125,10 @@
 .res__row b { font-family: var(--display); font-weight: 400; font-size: 22px; }
 .res__row small { font-family: var(--mono); font-size: 11px; color: #3a3b36; }
 .res__btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+/* the leaderboard line under the race results */
+.res__lb { margin: 4px 0 2px; color: #c9c8c0; font-size: 14px; line-height: 1.4; min-height: 1.4em; text-align: center; }
+.res__lb b { color: var(--acid); }
+.res__name { display: flex; gap: 8px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+.res__name input { height: 42px; border-radius: 12px; border: 1.5px solid var(--paper); background: transparent; color: var(--paper); padding: 0 12px; font: 500 16px var(--body); min-width: 0; flex: 1 1 150px; max-width: 220px; }
+.res__name input:focus { outline: none; border-color: var(--acid); }

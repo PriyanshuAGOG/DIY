@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <script>try{var t=JSON.parse(sessionStorage.getItem("diy.tx")||"null");if(t&&Date.now()-t.t<15000&&localStorage.getItem("diy.calm")!=="true"){document.documentElement.setAttribute("data-tx",t.type);setTimeout(function(){document.documentElement.removeAttribute("data-tx")},5000)}}catch(e){}</script>
   <title>Paper Arcade · Play, climb, win | Do It Yar</title>
-  <meta name="description" content="Three quick paper games, one season leaderboard. The top three players win real discounts on their next Do It Yar order.">
+  <meta name="description" content="Four quick games, one season leaderboard. The top three players win real discounts on their next Do It Yar order.">
   <meta name="theme-color" content="#121311">
   <link rel="icon" href="../assets/img/logo.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=Space+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/base.css?v=15">
-  <link rel="stylesheet" href="../assets/css/play.css?v=15">
+  <link rel="stylesheet" href="../assets/css/base.css?v=16">
+  <link rel="stylesheet" href="../assets/css/play.css?v=16">
 </head>
 <body class="grain gp" data-root="../" data-page="play" data-theme="dark">
 <main id="main">
@@ -23,7 +23,7 @@
       <div class="pl-hero__copy">
         <span class="mono">Do It Yar Paper Arcade / season leaderboard</span>
         <h1 class="display">Play.<br>Climb.<br><em>Win.</em></h1>
-        <p>Three quick paper games. Every score counts toward one all-round leaderboard. When the season ends, the top three players win real discounts on their next order.</p>
+        <p>Three quick paper games and the Paper Grand Prix. Every score counts toward one all-round leaderboard. When the season ends, the top three players win real discounts on their next order.</p>
         <div class="pl-hero__cta"><a class="btn btn--acid" href="#games">Pick a game <span class="arr">↓</span></a><a class="btn btn--ghost" href="#board">See the leaderboard</a></div>
       </div>
       <aside class="pl-cup" aria-label="Season prizes">
@@ -41,10 +41,10 @@
   <!-- ============ THE GAMES ============ -->
   <section class="pl-sec" id="games">
     <div class="wrap">
-      <div class="shead"><div><span class="mono">Choose your game</span><h2>Three ways<br>to climb.</h2></div><p>Each takes about a minute. Your best score in every game is added up for the all-round board, so playing all three beats being great at one.</p></div>
+      <div class="shead"><div><span class="mono">Choose your game</span><h2>Four ways<br>to climb.</h2></div><p>Each takes about a minute. Your best score in every game is added up for the all-round board, so playing all four beats being great at one.</p></div>
       <div class="pl-games" id="gameGrid"></div>
       <a class="pl-multi" href="../race/index.html" data-cursor="Race">
-        <div><span class="mono">Live multiplayer</span><b class="display">Paper Grand Prix</b><p>Race a friend head to head, online or on one screen. Pick any kit, shift in the green, first past the flag wins.</p></div>
+        <div><span class="mono">Live multiplayer</span><b class="display">Race a friend</b><p>Head to head, online or on one screen: bragging rights only. Races against the studio bot are the ones that score on the leaderboard.</p></div>
         <span class="btn btn--paper">Start racing <span class="arr">→</span></span>
       </a>
     </div>
@@ -84,7 +84,7 @@
     <div class="wrap">
       <div class="shead"><div><span class="mono">Fair play</span><h2>The small<br>print.</h2></div></div>
       <div class="pl-rules">
-        <article><b class="display">01</b><h3>Points, not luck</h3><p>Every game turns your score into up to 1,000 points. Your best score per game counts, so the all-round board can reach 3,000.</p></article>
+        <article><b class="display">01</b><h3>Points, not luck</h3><p>Every game turns your score into up to 1,000 points. Your best score per game counts, so the all-round board can reach 4,000.</p></article>
         <article><b class="display">02</b><h3>Top three win</h3><p>When the season ends, the top three on the all-round board each get a discount code. We contact winners using the details on their player card.</p></article>
         <article><b class="display">03</b><h3>Scores are checked</h3><p>Scores that couldn’t be played by a human are rejected, and we confirm every winner before any code is sent. Play fair and it never matters.</p></article>
         <article><b class="display">04</b><h3>Your data</h3><p>The leaderboard only shows your handle and score. Email and phone stay private and are used for prizes only.</p></article>
@@ -118,8 +118,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-<script src="../assets/js/data.js?v=15"></script>
-<script src="../assets/js/core.js?v=15"></script>
-<script src="../assets/js/play.js?v=15"></script>
+<script src="../assets/js/data.js?v=16"></script>
+<script src="../assets/js/core.js?v=16"></script>
+<script src="../assets/js/arcade.js?v=16"></script>
+<script src="../assets/js/play.js?v=16"></script>
 </body>
 </html>

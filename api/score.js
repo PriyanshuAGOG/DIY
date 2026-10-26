@@ -1,15 +1,16 @@
 // POST /api/score  { pid, token, game, score, ms, name }  (contact details are saved only with consent)
-const { SEASON, GAMES, points, redis, creds, hash, cleanName, live, send, readJson } = require('../lib/play');
+const { raceScore, SEASON, GAMES, points, redis, creds, hash, cleanName, live, send, readJson } = require('../lib/play');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return send(res, 405, { ok: false, reason: 'method' });
   if (!creds()) return send(res, 503, { ok: false, reason: 'not-configured' });
   try {
     const b = await readJson(req), game = b.game, G = GAMES[game];
-    const pid = String(b.pid || ''), token = String(b.token || ''), score = Math.floor(+b.score), ms = Math.floor(+b.ms);
+    const pid = String(b.pid || ''), token = String(b.token || ''), ms = Math.floor(+b.ms); let score = Math.floor(+b.score);
     if (!G || !/^[a-z0-9-]{12,40}$/i.test(pid) || token.length < 16 || !Number.isFinite(score) || !Number.isFinite(ms)) return send(res, 400, { ok: false, reason: 'bad-input' });
     if (!live()) return send(res, 410, { ok: false, reason: 'season-over' });
-    if (score < 1 || score > G.max || ms < score * G.minMsPerPoint || ms > 3600000) return send(res, 422, { ok: false, reason: 'implausible' });
+    if (G.time) { if (!(ms >= G.minMs && ms <= G.maxMs)) return send(res, 422, { ok: false, reason: 'implausible' }); score = raceScore(ms); } // a race is scored from its time on the server
+    if (score < 1 || score > G.max || (!G.time && (ms < score * G.minMsPerPoint || ms > 3600000))) return send(res, 422, { ok: false, reason: 'implausible' });
     const name = cleanName(b.name), th = hash(token);
     const [saved, gate] = await redis([['HGET', 'pl:' + pid, 'th'], ['SET', 'rl:' + pid, '1', 'NX', 'EX', 6]]);
     if (saved && saved !== th) return send(res, 403, { ok: false, reason: 'not-you' });

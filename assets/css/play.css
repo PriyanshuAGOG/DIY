@@ -39,7 +39,7 @@
 .pl-challenge .btn { --bg: var(--ink); --fg: var(--paper); }
 
 /* ---------- game cards ---------- */
-.pl-games { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.6vw, 26px); }
+.pl-games { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.6vw, 26px); }
 .pg { position: relative; display: grid; grid-template-rows: auto 1fr auto; gap: 12px; text-align: left; padding: clamp(18px, 2vw, 28px); border-radius: 26px; border: 2px solid var(--ink); background: var(--c); color: var(--ink); min-height: clamp(300px, 44vh, 440px); box-shadow: 8px 8px 0 rgba(247,245,239,.9); transition: translate .35s var(--ease), box-shadow .35s var(--ease); }
 .pg:hover { translate: -4px -6px; box-shadow: 14px 16px 0 var(--orange); }
 .pg__art { height: clamp(110px, 17vh, 170px); display: grid; place-items: center; }
@@ -56,6 +56,7 @@
 .pl-multi .mono { color: var(--acid); }
 .pl-multi b { display: block; margin: 8px 0; font-size: clamp(28px, calc(var(--u) * 3.6), 56px); line-height: .9; }
 .pl-multi p { margin: 0; max-width: 52ch; color: #c9c8c0; }
+@media (max-width: 1180px) and (min-width: 961px) { .pl-games { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 960px) { .pl-games { grid-template-columns: 1fr; } .pg { min-height: 0; grid-template-columns: 1fr 1.4fr; grid-template-rows: auto auto; grid-template-areas: "art txt" "art foot"; column-gap: 16px; } .pg__art { grid-area: art; height: auto; } .pg__txt { grid-area: txt; } .pg__foot { grid-area: foot; } }
 @media (max-width: 520px) { .pg { grid-template-columns: 1fr; grid-template-areas: none; } .pg__art, .pg__txt, .pg__foot { grid-area: auto; } .pg__art { height: 120px; } }
 

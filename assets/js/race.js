@@ -236,8 +236,24 @@
     if (youWin && !tie) { const r = $('#track').getBoundingClientRect(); confetti(r.left + 80, r.top + r.height / 2, 70); }
     if (mode === 'bot' && youWin && !tie) reward('race', 2, `Beat the ${diff} bot`);
     lastResult = { win: youWin && !tie, time: fmt(ta), car: byId(P.A.car).name, opp: nameB };
+    leaderboardLine(ta);
   }
   let lastResult = null;
+
+  // a solo race against the bot counts on the Paper Arcade season leaderboard (time -> score, worked out on the server too)
+  function leaderboardLine(t) {
+    const el = $('#resLb'), A = window.DIYarcade; if (!el || !A) return;
+    el.innerHTML = '';
+    if (mode !== 'bot') { el.textContent = 'Races against the studio bot count toward the season leaderboard.'; return; }
+    if (!Number.isFinite(t)) return;
+    const ms = Math.round(t * 1000), score = A.raceScore(ms);
+    if (ms > 9000 || score < 1) { el.textContent = 'Finish in under 9 seconds to score on the leaderboard.'; return; }
+    A.saveBest('race', score);
+    const post = async () => { el.textContent = 'Posting your time to the leaderboard...'; el.textContent = score + ' pts. ' + await A.submit('race', score, ms); };
+    if (A.P.name) { post(); return; }
+    el.innerHTML = '<span>Pick a handle to put <b>' + t.toFixed(2) + 's</b> on the leaderboard:</span><form class="res__name"><input name="n" maxlength="18" placeholder="Your handle" autocomplete="nickname" required><button class="btn btn--acid btn--sm" type="submit">Post</button></form>';
+    const f = $('.res__name', el); f.addEventListener('submit', e => { e.preventDefault(); const n = A.cleanName(f.n.value); if (n.length < 2) return; A.P.name = n; A.savePlayer(); post(); });
+  }
 
   $('#goBtn').addEventListener('click', () => { if (phase === 'count' || phase === 'go') return; startRace(rand(.3, .9)); });
   $('#rematch').addEventListener('click', () => {
